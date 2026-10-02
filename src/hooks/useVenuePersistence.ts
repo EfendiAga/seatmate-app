@@ -144,7 +144,7 @@ export const useVenuePersistence = () => {
       const lastSlug = storage.getLastSlug();
       if (lastSlug) {
           console.log(`Persistence Hook: No slug in URL, found last used slug '${lastSlug}', navigating...`);
-        router.push(`/${lastSlug}`, { replace: true });
+        router.replace(`/${lastSlug}`);
         // The hook will re-run with the actual slug now, triggering the 'else' block below
       } else {
         // === No Slug & No Last Slug: Generate New Venue ===
@@ -172,7 +172,7 @@ export const useVenuePersistence = () => {
         setVenuePin(newPin); // Update Jotai atom for PIN display
         setEditMode(true); // Update Jotai atom for edit mode
 
-        router.push(`/${newSlug}`, { replace: true });
+        router.replace(`/${newSlug}`);
         isInitialLoadComplete.current = true;
         loadedSlugRef.current = newSlug;
       }
@@ -367,7 +367,7 @@ export const useVenuePersistence = () => {
     setVenuePin(newPin); // Update Jotai atom
     setEditMode(true); // Update Jotai atom
 
-    router.push(`/${newSlug}`, { replace: true });
+    router.replace(`/${newSlug}`);
   }, [
     navigate,
     setShapes,

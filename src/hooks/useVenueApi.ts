@@ -74,10 +74,13 @@ export const useUpdateVenueMutation = (
 
   return useMutation({
     mutationFn: ({ slug, data }) => updateVenue(slug, data),
+    ...options,
     onSuccess: (data, variables, context) => {
       queryClient.invalidateQueries({ queryKey: ["venue", variables.slug] });
-      options?.onSuccess?.(data, variables, context);
+      if (options?.onSuccess) {
+        // @ts-ignore
+        options.onSuccess(data, variables, context);
+      }
     },
-    ...options,
   });
 };
