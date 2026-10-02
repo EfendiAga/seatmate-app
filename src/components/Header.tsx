@@ -23,6 +23,11 @@ import { GuestListSheet } from "./GuestListSheet";
 import { GuestSearch } from "./GuestSearch";
 import { useTheme } from "@/components/ThemeProvider";
 import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
@@ -346,7 +351,7 @@ export const Header: React.FC<HeaderProps> = ({
 
         {/* Right section - Stats and actions - ensure this section doesn't cause overflow with new button */}
         <div className="flex items-center space-x-2 sm:space-x-3 flex-shrink-0 order-2 lg:order-4">
-          <GuestSearch />
+          {editMode && <GuestSearch />}
           
           {/* Save Status Indicator */}
           {editMode && (
@@ -450,55 +455,44 @@ export const Header: React.FC<HeaderProps> = ({
               </TooltipProvider>
             </div>
           ) : !editMode ? (
-            <div className="flex items-center space-x-1.5">
-              <Input
-                type="password"
-                maxLength={4}
-                placeholder="PIN"
-                value={pinEntry}
-                onChange={(e) => setPinEntry(e.target.value.replace(/\D/g, ""))}
-                className="h-10 w-20 bg-card/60 border-border/30 focus:border-primary/50 focus:bg-card/80 text-center font-mono tracking-widest"
-                aria-label="Enter 4-digit PIN to edit"
-                disabled={isPinSubmitting}
-              />
-              <Button
-                variant="outline"
-                size="default"
-                onClick={handlePinUnlock}
-                disabled={isPinSubmitting || pinEntry.length !== 4}
-                className="h-10 shadow-sm border-primary/50 text-primary hover:bg-primary/5 hover:text-primary"
-              >
-                {isPinSubmitting ? (
-                  <>
-                    <svg
-                      className="mr-1.5 animate-spin h-4 w-4"
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 24 24"
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button 
+                  variant="outline" 
+                  size="icon" 
+                  className="h-10 w-10 bg-card hover:bg-accent hover:text-accent-foreground border-border transition-colors shadow-sm"
+                  aria-label="Unlock to Edit"
+                >
+                  <Lock size={16} />
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-64 p-4 mt-2" align="end">
+                <div className="space-y-4">
+                  <h4 className="font-medium leading-none">Unlock Event</h4>
+                  <p className="text-sm text-muted-foreground">Enter the 4-digit PIN to edit.</p>
+                  <div className="flex space-x-2">
+                    <Input
+                      type="password"
+                      maxLength={4}
+                      placeholder="PIN"
+                      value={pinEntry}
+                      onChange={(e) => setPinEntry(e.target.value.replace(/\D/g, ""))}
+                      className="h-10 text-center font-mono tracking-widest"
+                      aria-label="Enter 4-digit PIN to edit"
+                      disabled={isPinSubmitting}
+                    />
+                    <Button
+                      variant="default"
+                      onClick={handlePinUnlock}
+                      disabled={isPinSubmitting || pinEntry.length !== 4}
+                      className="h-10"
                     >
-                      <circle
-                        className="opacity-25"
-                        cx="12"
-                        cy="12"
-                        r="10"
-                        stroke="currentColor"
-                        strokeWidth="4"
-                      ></circle>
-                      <path
-                        className="opacity-75"
-                        fill="currentColor"
-                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                      ></path>
-                    </svg>
-                    Unlocking...
-                  </>
-                ) : (
-                  <>
-                    <Unlock size={16} className="mr-1.5" /> Unlock
-                  </>
-                )}
-              </Button>
-            </div>
+                      {isPinSubmitting ? "..." : "Unlock"}
+                    </Button>
+                  </div>
+                </div>
+              </PopoverContent>
+            </Popover>
           ) : null}
 
           <div className="bg-card/80 backdrop-blur-sm border border-border/30 rounded-lg px-4 py-2.5 shadow-sm transition-all hover:shadow-md">

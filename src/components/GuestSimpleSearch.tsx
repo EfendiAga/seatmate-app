@@ -51,24 +51,24 @@ export function GuestSimpleSearch() {
   }, [assignedTable, guests, selectedGuest]);
 
   return (
-    <div className="flex flex-col items-center justify-start w-full min-h-full p-4 md:p-8 bg-gradient-to-b from-background to-muted/20 overflow-y-auto">
-      <div className="w-full max-w-xl mx-auto space-y-8 mt-4 md:mt-12 animate-in fade-in slide-in-from-bottom-4 duration-700 ease-out pb-20">
+    <div className="flex flex-col items-center justify-start w-full min-h-full p-2 md:p-4 bg-gradient-to-b from-background to-muted/20 overflow-y-auto">
+      <div className="w-full max-w-xl mx-auto space-y-4 mt-2 md:mt-4 animate-in fade-in slide-in-from-bottom-4 duration-700 ease-out pb-10">
         
         {/* Header Section */}
-        <div className="text-center space-y-2">
+        <div className="text-center space-y-1">
           <Badge variant="secondary" className="px-3 py-1 bg-primary/10 text-primary hover:bg-primary/20 transition-colors">
             Welcome to
           </Badge>
-          <h1 className="text-3xl md:text-5xl font-extrabold tracking-tight text-foreground bg-clip-text text-transparent bg-gradient-to-r from-primary to-primary/60 pb-2">
+          <h1 className="text-2xl md:text-4xl font-extrabold tracking-tight text-foreground bg-clip-text text-transparent bg-gradient-to-r from-primary to-primary/60 pb-1">
             {eventTitle}
           </h1>
-          <p className="text-muted-foreground text-lg">Find your seat to get started.</p>
+          <p className="text-muted-foreground text-sm">Find your seat to get started.</p>
         </div>
 
         {/* Search Input */}
         <div className="relative group">
-          <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-            <Search className="h-6 w-6 text-muted-foreground group-focus-within:text-primary transition-colors" />
+          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <Search className="h-5 w-5 text-muted-foreground group-focus-within:text-primary transition-colors" />
           </div>
           <Input
             value={searchQuery}
@@ -78,7 +78,7 @@ export function GuestSimpleSearch() {
               setSearchedGuestId(null);
             }}
             placeholder="Enter your first or last name..."
-            className="pl-12 h-16 text-lg rounded-2xl border-2 border-primary/20 shadow-lg focus-visible:ring-primary focus-visible:border-primary transition-all bg-card/80 backdrop-blur-sm hover:border-primary/40"
+            className="pl-10 h-12 text-base rounded-xl border-2 border-primary/20 shadow-sm focus-visible:ring-primary focus-visible:border-primary transition-all bg-card/90 backdrop-blur-sm hover:border-primary/40"
           />
         </div>
 
@@ -181,11 +181,11 @@ export function GuestSimpleSearch() {
         )}
 
         {/* Static Floor Plan */}
-        <div className="mt-12 bg-card rounded-3xl shadow-xl border border-border/50 overflow-hidden">
-          <div className="p-4 bg-muted/30 border-b border-border/50">
-            <h3 className="text-lg font-semibold text-center">Floor Plan Overview</h3>
+        <div className="mt-4 bg-card rounded-2xl shadow-lg border border-border/50 overflow-hidden">
+          <div className="p-3 bg-muted/30 border-b border-border/50">
+            <h3 className="text-base font-semibold text-center">Floor Plan Overview</h3>
           </div>
-          <div className="w-full h-[400px] md:h-[600px] relative pointer-events-none">
+          <div className="w-full h-[350px] md:h-[500px] relative pointer-events-none">
             <SortedCanvasStageAdapter shapeAtoms={shapeAtoms} isStatic={true} />
           </div>
         </div>

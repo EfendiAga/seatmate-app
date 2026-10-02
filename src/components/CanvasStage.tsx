@@ -227,19 +227,21 @@ export const CanvasStage: React.FC<CanvasStageProps & { isStatic?: boolean }> = 
     setStagePos(newPos);
   }, [baseShapes, setGlobalStageScale]);
 
-  // Effect to fit content on initial load
+  // Effect to fit content on initial load and resize for static view
   useEffect(() => {
-    if (!initialFitDone && baseShapes.length > 0) {
-      // Wait a bit for the stage to be fully rendered
-      const timer = setTimeout(() => {
-        if (stageRef.current && stageRef.current.width() > 0 && stageRef.current.height() > 0) {
-          fitContentToView();
-          setInitialFitDone(true);
-        }
-      }, 300);
-      return () => clearTimeout(timer);
+    if (baseShapes.length > 0) {
+      if (!initialFitDone || isStatic) {
+        // Wait a bit for the stage to be fully rendered
+        const timer = setTimeout(() => {
+          if (stageRef.current && stageRef.current.width() > 0 && stageRef.current.height() > 0) {
+            fitContentToView();
+            setInitialFitDone(true);
+          }
+        }, 100); // reduced timeout for better responsiveness
+        return () => clearTimeout(timer);
+      }
     }
-  }, [baseShapes, initialFitDone, fitContentToView]);
+  }, [baseShapes, initialFitDone, fitContentToView, stageSize, isStatic]);
 
   // Effect to pan to searched guest
   useEffect(() => {
@@ -257,8 +259,10 @@ export const CanvasStage: React.FC<CanvasStageProps & { isStatic?: boolean }> = 
            });
         }
       }
+    } else if (isStatic && initialFitDone) {
+      fitContentToView();
     }
-  }, [searchedGuestId, guests, baseShapes, stageSize, setGlobalStageScale]);
+  }, [searchedGuestId, guests, baseShapes, stageSize, setGlobalStageScale, isStatic, initialFitDone, fitContentToView]);
 
   // Effect to handle window resizing and set initial stage size
   useEffect(() => {
