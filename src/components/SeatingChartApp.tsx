@@ -23,6 +23,7 @@ import type { Table, VenueElement } from "../types/seatingChart";
 import { GuestAssignmentModal } from "./GuestAssignmentModal";
 import { RenameElementModal } from "./RenameElementModal";
 import { SortedCanvasStageAdapter } from "./SortedCanvasStageAdapter";
+import { GuestSimpleSearch } from "./GuestSimpleSearch";
 import { useVenuePersistence } from "@/hooks/useVenuePersistence";
 import { nanoid } from "nanoid";
 import {
@@ -483,10 +484,14 @@ export const SeatingChartApp = () => {
         ) : null}
         <div className="flex-1 flex flex-col p-4 md:p-5 border-l border-border/40 bg-background/50">
           <div
-            className="flex-1 relative rounded-lg glass shadow-premium rounded-2xl overflow-hidden"
+            className={`flex-1 relative rounded-lg ${editMode ? 'glass shadow-premium rounded-2xl' : ''} overflow-hidden`}
             tabIndex={1}
           >
-            <SortedCanvasStageAdapter shapeAtoms={shapeAtoms} />
+            {editMode ? (
+              <SortedCanvasStageAdapter shapeAtoms={shapeAtoms} />
+            ) : (
+              <GuestSimpleSearch />
+            )}
           </div>
         </div>
       </div>
