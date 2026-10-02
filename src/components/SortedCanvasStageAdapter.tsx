@@ -6,11 +6,12 @@ import { CanvasStage } from "./CanvasStage"; // Adjust path if needed
 
 interface SortedCanvasStageAdapterProps {
   shapeAtoms: PrimitiveAtom<Shape>[];
+  isStatic?: boolean;
 }
 
 export const SortedCanvasStageAdapter: React.FC<
   SortedCanvasStageAdapterProps
-> = ({ shapeAtoms }) => {
+> = ({ shapeAtoms, isStatic = false }) => {
   // Create a memoized derived atom that reads all shape values from the passed atoms.
   const getShapeValuesAtom = useMemo(
     () => atom((get) => shapeAtoms.map((primitiveAtom) => get(primitiveAtom))),
@@ -47,5 +48,5 @@ export const SortedCanvasStageAdapter: React.FC<
     return atomsWithValues.map((item) => item.atom);
   }, [shapeAtoms, shapeValues]); // Re-sort if atoms array or their values change
 
-  return <CanvasStage shapeAtoms={sortedAtomsForCanvas} />;
+  return <CanvasStage shapeAtoms={sortedAtomsForCanvas} isStatic={isStatic} />;
 };

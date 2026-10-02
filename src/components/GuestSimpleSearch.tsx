@@ -3,14 +3,18 @@ import React, { useState, useMemo } from "react";
 import { Input } from "@/components/ui/input";
 import { Search, MapPin, Users, User, ArrowRight } from "lucide-react";
 import { useAtomValue } from "jotai";
-import { guestsAtom, baseShapesAtom, eventTitleAtom } from "@/lib/atoms";
+import { guestsAtom, baseShapesAtom, eventTitleAtom, shapeAtomsAtom, searchedGuestIdAtom } from "@/lib/atoms";
 import { Table } from "@/types/seatingChart";
 import { Badge } from "@/components/ui/badge";
+import { SortedCanvasStageAdapter } from "./SortedCanvasStageAdapter";
+import { useSetAtom } from "jotai";
 
 export function GuestSimpleSearch() {
   const guests = useAtomValue(guestsAtom);
   const baseShapes = useAtomValue(baseShapesAtom);
   const eventTitle = useAtomValue(eventTitleAtom);
+  const shapeAtoms = useAtomValue(shapeAtomsAtom);
+  const setSearchedGuestId = useSetAtom(searchedGuestIdAtom);
   const [searchQuery, setSearchQuery] = useState("");
 
   const tables = useMemo(
@@ -68,6 +72,7 @@ export function GuestSimpleSearch() {
             onChange={(e) => {
               setSearchQuery(e.target.value);
               setSelectedGuestId(null); // Reset selection on new search
+              setSearchedGuestId(null);
             }}
             placeholder="Enter your first or last name..."
             className="pl-12 h-16 text-lg rounded-2xl border-2 border-primary/20 shadow-lg focus-visible:ring-primary focus-visible:border-primary transition-all bg-card/80 backdrop-blur-sm hover:border-primary/40"
@@ -81,7 +86,10 @@ export function GuestSimpleSearch() {
               {filteredGuests.map((guest) => (
                 <button
                   key={guest.id}
-                  onClick={() => setSelectedGuestId(guest.id)}
+                  onClick={() => {
+                    setSelectedGuestId(guest.id);
+                    setSearchedGuestId(guest.id);
+                  }}
                   className="w-full flex items-center justify-between p-4 hover:bg-muted/50 transition-colors border-b border-border/50 last:border-0 text-left group"
                 >
                   <div className="flex items-center space-x-3">
@@ -158,6 +166,7 @@ export function GuestSimpleSearch() {
               <button 
                 onClick={() => {
                   setSelectedGuestId(null);
+                  setSearchedGuestId(null);
                   setSearchQuery("");
                 }}
                 className="text-primary font-medium hover:underline px-4 py-2"
@@ -167,6 +176,16 @@ export function GuestSimpleSearch() {
             </div>
           </div>
         )}
+
+        {/* Static Floor Plan */}
+        <div className="mt-12 bg-card rounded-3xl shadow-xl border border-border/50 overflow-hidden">
+          <div className="p-4 bg-muted/30 border-b border-border/50">
+            <h3 className="text-lg font-semibold text-center">Floor Plan Overview</h3>
+          </div>
+          <div className="w-full h-[400px] md:h-[600px] relative pointer-events-none">
+            <SortedCanvasStageAdapter shapeAtoms={shapeAtoms} isStatic={true} />
+          </div>
+        </div>
 
       </div>
     </div>
