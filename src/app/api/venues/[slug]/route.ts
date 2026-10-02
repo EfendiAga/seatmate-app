@@ -3,8 +3,9 @@ import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
-export async function GET(req: Request, { params }: { params: { slug: string } }) {
+export async function GET(req: Request, props: { params: Promise<{ slug: string }> }) {
   try {
+    const params = await props.params;
     const venue = await prisma.venue.findUnique({
       where: { slug: params.slug }
     });
@@ -19,8 +20,9 @@ export async function GET(req: Request, { params }: { params: { slug: string } }
   }
 }
 
-export async function PUT(req: Request, { params }: { params: { slug: string } }) {
+export async function PUT(req: Request, props: { params: Promise<{ slug: string }> }) {
   try {
+    const params = await props.params;
     const data = await req.json();
     
     // Check if it exists
