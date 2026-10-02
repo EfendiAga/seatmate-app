@@ -229,7 +229,6 @@ export const useVenuePersistence = () => {
       slug &&
       isServerLoadSuccess &&
       serverData &&
-      loadedSlugRef.current !== slug &&
       !pinNeedsSync.current
     ) {
         console.log("Persistence Hook: Server data received, updating Jotai and localStorage.");
@@ -438,3 +437,4 @@ export const useVenuePersistence = () => {
     attemptUnlock,
   };
 };
+
