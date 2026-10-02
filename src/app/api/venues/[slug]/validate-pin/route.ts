@@ -1,0 +1,26 @@
+import { NextResponse } from 'next/server';
+import { PrismaClient } from '@prisma/client';
+
+const prisma = new PrismaClient();
+
+export async function POST(req: Request, { params }: { params: { slug: string } }) {
+  try {
+    const { pin } = await req.json();
+    
+    const venue = await prisma.venue.findUnique({
+      where: { slug: params.slug }
+    });
+    
+    if (!venue) {
+      return NextResponse.json({ success: false, message: 'Venue not found' }, { status: 404 });
+    }
+    
+    if (venue.pin === pin) {
+      return NextResponse.json({ success: true });
+    } else {
+      return NextResponse.json({ success: false, message: 'Invalid PIN' }, { status: 403 });
+    }
+  } catch (error) {
+    return NextResponse.json({ error: String(error) }, { status: 500 });
+  }
+}
