@@ -25,7 +25,7 @@ export function GuestSimpleSearch() {
   const filteredGuests = useMemo(() => {
     if (!searchQuery.trim()) return [];
     const query = searchQuery.toLowerCase();
-    return guests.filter((g) => g.name.toLowerCase().includes(query));
+    return guests.filter((g) => (g.name || "").toLowerCase().includes(query));
   }, [guests, searchQuery]);
 
   const [selectedGuestId, setSelectedGuestId] = useState<string | null>(null);
@@ -96,7 +96,7 @@ export function GuestSimpleSearch() {
                     <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center text-primary group-hover:scale-110 transition-transform">
                       <User size={20} />
                     </div>
-                    <span className="font-medium text-lg">{guest.name}</span>
+                    <span className="font-medium text-lg">{guest.name || "Unnamed Guest"}</span>
                   </div>
                   <ArrowRight size={20} className="text-muted-foreground group-hover:text-primary group-hover:translate-x-1 transition-all" />
                 </button>
@@ -120,7 +120,7 @@ export function GuestSimpleSearch() {
               <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-50" />
               <MapPin size={48} className="mx-auto text-primary mb-4 animate-bounce" />
               <h2 className="text-2xl font-semibold text-foreground mb-1">
-                {selectedGuest.name}
+                {selectedGuest.name || "Unnamed Guest"}
               </h2>
               <div className="text-muted-foreground mb-4">You are seated at</div>
               
@@ -143,7 +143,7 @@ export function GuestSimpleSearch() {
                       <div className="h-8 w-8 rounded-full bg-background flex items-center justify-center text-muted-foreground">
                         <User size={16} />
                       </div>
-                      <span className="font-medium">{mate.name}</span>
+                      <span className="font-medium">{mate.name || "Unnamed Guest"}</span>
                     </div>
                   ))}
                 </div>
