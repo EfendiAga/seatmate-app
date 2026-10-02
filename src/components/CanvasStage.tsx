@@ -162,7 +162,7 @@ export const CanvasStage: React.FC<CanvasStageProps> = ({ shapeAtoms }) => {
   // Function to fit all content in view
   const fitContentToView = useCallback(() => {
     const stage = stageRef.current;
-    if (!stage) return;
+    if (!stage || stage.width() === 0 || stage.height() === 0) return;
 
     // Skip if no shapes
     if (baseShapes.length === 0) return;
@@ -176,23 +176,19 @@ export const CanvasStage: React.FC<CanvasStageProps> = ({ shapeAtoms }) => {
     // Check each shape to find the overall bounding box
     baseShapes.forEach((shape) => {
       if (shape.type === "venue") {
-        // For venue elements (rectangles)
         const left = shape.x;
         const top = shape.y;
         const right = shape.x + shape.width;
         const bottom = shape.y + shape.height;
-
         minX = Math.min(minX, left);
         minY = Math.min(minY, top);
         maxX = Math.max(maxX, right);
         maxY = Math.max(maxY, bottom);
       } else if (shape.type === "table") {
-        // For tables (circles)
         const left = shape.x - shape.radius;
         const top = shape.y - shape.radius;
         const right = shape.x + shape.radius;
         const bottom = shape.y + shape.radius;
-
         minX = Math.min(minX, left);
         minY = Math.min(minY, top);
         maxX = Math.max(maxX, right);
@@ -207,20 +203,17 @@ export const CanvasStage: React.FC<CanvasStageProps> = ({ shapeAtoms }) => {
     maxX += padding;
     maxY += padding;
 
-    // Calculate content dimensions
     const contentWidth = maxX - minX;
     const contentHeight = maxY - minY;
 
-    // Calculate available viewport dimensions
     const stageWidth = stage.width();
     const stageHeight = stage.height();
 
-    // Calculate scale to fit content
     const scaleX = stageWidth / contentWidth;
     const scaleY = stageHeight / contentHeight;
-    const scale = Math.min(scaleX, scaleY, 1); // Don't zoom in beyond 100%
+    let scale = Math.min(scaleX, scaleY, 1);
+    scale = Math.max(scale, 0.1); // Prevent scaling to 0
 
-    // Calculate position to center content
     const centerX = (minX + maxX) / 2;
     const centerY = (minY + maxY) / 2;
 
@@ -229,7 +222,6 @@ export const CanvasStage: React.FC<CanvasStageProps> = ({ shapeAtoms }) => {
       y: stageHeight / 2 - centerY * scale,
     };
 
-    // Apply new scale and position
     setStageInternalScale(scale);
     setGlobalStageScale(scale);
     setStagePos(newPos);
@@ -240,8 +232,10 @@ export const CanvasStage: React.FC<CanvasStageProps> = ({ shapeAtoms }) => {
     if (!initialFitDone && baseShapes.length > 0) {
       // Wait a bit for the stage to be fully rendered
       const timer = setTimeout(() => {
-        fitContentToView();
-        setInitialFitDone(true);
+        if (stageRef.current && stageRef.current.width() > 0 && stageRef.current.height() > 0) {
+          fitContentToView();
+          setInitialFitDone(true);
+        }
       }, 300);
       return () => clearTimeout(timer);
     }
