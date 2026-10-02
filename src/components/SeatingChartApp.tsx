@@ -443,24 +443,26 @@ export const SeatingChartApp = () => {
         isMobileSidebarOpen={isSheetOpen}
         attemptUnlock={attemptUnlock}
       />
-      <Toolbar 
-        onAddTable={handleAddTable} 
-        editMode={editMode} 
-        selectedShapeCount={selectedShapeIds.length}
-        onAlignHorizontal={handleAlignHorizontal}
-        onAlignVertical={handleAlignVertical}
-        onDistributeHorizontal={handleDistributeHorizontal}
-        onDistributeVertical={handleDistributeVertical}
-      />
+      {editMode && (
+        <Toolbar 
+          onAddTable={handleAddTable} 
+          editMode={editMode} 
+          selectedShapeCount={selectedShapeIds.length}
+          onAlignHorizontal={handleAlignHorizontal}
+          onAlignVertical={handleAlignVertical}
+          onDistributeHorizontal={handleDistributeHorizontal}
+          onDistributeVertical={handleDistributeVertical}
+        />
+      )}
       <div className="flex flex-1 overflow-hidden">
-        {isDesktop ? (
+        {editMode && isDesktop ? (
           <Sidebar
             guests={guestsValue}
             tables={baseShapesValue.filter(
               (s): s is Table => s.type === "table",
             )}
           />
-        ) : (
+        ) : editMode && !isDesktop ? (
           <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
             <SheetContent
               side="left"
@@ -478,7 +480,7 @@ export const SeatingChartApp = () => {
               />
             </SheetContent>
           </Sheet>
-        )}
+        ) : null}
         <div className="flex-1 flex flex-col p-4 md:p-5 border-l border-border/40 bg-background/50">
           <div
             className="flex-1 relative rounded-lg glass shadow-premium rounded-2xl overflow-hidden"

@@ -508,11 +508,10 @@ const TableCircleContent: React.FC<{
         */}
         {/* Seat Occupancy Badge - END COMMENTING OUT */}
 
-        {/* Buttons container for centering the controls */}
         <Group
           x={0}
           y={FONT_SIZE_SMALL + currentPadding * 3}
-          visible={isTableHovered || isSelected}
+          visible={(isTableHovered || isSelected) && editMode}
         >
           {/* Minus Button */}
           <Group

@@ -484,7 +484,7 @@ export const CanvasStage: React.FC<CanvasStageProps> = ({ shapeAtoms }) => {
           y={stagePos.y}
           scaleX={stageInternalScale}
           scaleY={stageInternalScale}
-          draggable={isAltPressed}
+          draggable={isAltPressed || !editMode}
           onDragEnd={(e) => {
             if (e.target === stageRef.current) {
               setStagePos(e.target.position());
@@ -576,6 +576,69 @@ export const CanvasStage: React.FC<CanvasStageProps> = ({ shapeAtoms }) => {
                 <span className="text-xs opacity-75 ml-1">(Ctrl+0)</span>
               </p>
             </TooltipContent>
+          </Tooltip>
+
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                variant="outline"
+                size="icon"
+                className="w-8 h-8 bg-card/80 border-border/40 hover:bg-card shadow-sm"
+                onClick={() => {
+                   const stage = stageRef.current;
+                   if (!stage) return;
+                   const oldScale = stage.scaleX();
+                   const newScale = Math.min(oldScale * 1.2, 10);
+                   setStageInternalScale(newScale);
+                   setGlobalStageScale(newScale);
+                   // Center zoom roughly
+                   const centerX = stage.width() / 2;
+                   const centerY = stage.height() / 2;
+                   const mousePointTo = {
+                     x: (centerX - stage.x()) / oldScale,
+                     y: (centerY - stage.y()) / oldScale,
+                   };
+                   setStagePos({
+                     x: centerX - mousePointTo.x * newScale,
+                     y: centerY - mousePointTo.y * newScale,
+                   });
+                }}
+              >
+                <ZoomIn size={16} />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent><p>Zoom In</p></TooltipContent>
+          </Tooltip>
+
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                variant="outline"
+                size="icon"
+                className="w-8 h-8 bg-card/80 border-border/40 hover:bg-card shadow-sm"
+                onClick={() => {
+                   const stage = stageRef.current;
+                   if (!stage) return;
+                   const oldScale = stage.scaleX();
+                   const newScale = Math.max(oldScale / 1.2, 0.1);
+                   setStageInternalScale(newScale);
+                   setGlobalStageScale(newScale);
+                   const centerX = stage.width() / 2;
+                   const centerY = stage.height() / 2;
+                   const mousePointTo = {
+                     x: (centerX - stage.x()) / oldScale,
+                     y: (centerY - stage.y()) / oldScale,
+                   };
+                   setStagePos({
+                     x: centerX - mousePointTo.x * newScale,
+                     y: centerY - mousePointTo.y * newScale,
+                   });
+                }}
+              >
+                <ZoomOut size={16} />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent><p>Zoom Out</p></TooltipContent>
           </Tooltip>
         </TooltipProvider>
       </div>

@@ -1,9 +1,12 @@
 "use client";
 import { Info, X as CloseIcon } from "lucide-react";
 import { useState } from "react";
+import { useAtomValue } from "jotai";
+import { editModeAtom } from "@/lib/atoms";
 
 export const CanvasTipsOverlay: React.FC = () => {
   const [isVisible, setIsVisible] = useState(true);
+  const editMode = useAtomValue(editModeAtom);
 
   if (!isVisible) {
     return null;
@@ -22,41 +25,45 @@ export const CanvasTipsOverlay: React.FC = () => {
         <Info className="mr-1.5 text-accent/80" size={15} strokeWidth={1.5} />
         Quick Tips
       </h3>
-      <p className="flex items-center text-xs leading-relaxed">
-        <span className="text-primary font-semibold mr-1.5 text-xs opacity-80">
-          ➤
-        </span>{" "}
-        Use{" "}
-        <kbd className="px-1.5 py-0.5 rounded bg-muted/80 mx-1 text-xs shadow-sm">
-          Alt + Mouse
-        </kbd>{" "}
-        to pan
-      </p>
-      <p className="flex items-center text-xs leading-relaxed">
-        <span className="text-primary font-semibold mr-1.5 text-xs opacity-80">
-          ➤
-        </span>{" "}
-        <kbd className="px-1.5 py-0.5 rounded bg-muted/80 mx-1 text-xs shadow-sm">
-          Scroll
-        </kbd>{" "}
-        to zoom in/out
-      </p>
-      <p className="flex items-center text-xs leading-relaxed">
-        <span className="text-primary font-semibold mr-1.5 text-xs opacity-80">
-          ➤
-        </span>{" "}
-        Double-click text to rename elements
-      </p>
-      <p className="flex items-center text-xs leading-relaxed pt-1 mt-1 border-t border-border/30">
-        <span className="text-destructive font-semibold mr-1.5 text-xs opacity-90">
-          ➤
-        </span>{" "}
-        Press{" "}
-        <kbd className="px-1.5 py-0.5 rounded bg-muted/80 mx-1 text-xs shadow-sm">
-          Delete
-        </kbd>{" "}
-        to remove selected element
-      </p>
+      {editMode && (
+        <>
+          <p className="flex items-center text-xs leading-relaxed">
+            <span className="text-primary font-semibold mr-1.5 text-xs opacity-80">
+              ➤
+            </span>{" "}
+            Use{" "}
+            <kbd className="px-1.5 py-0.5 rounded bg-muted/80 mx-1 text-xs shadow-sm">
+              Alt + Mouse
+            </kbd>{" "}
+            to pan
+          </p>
+          <p className="flex items-center text-xs leading-relaxed">
+            <span className="text-primary font-semibold mr-1.5 text-xs opacity-80">
+              ➤
+            </span>{" "}
+            <kbd className="px-1.5 py-0.5 rounded bg-muted/80 mx-1 text-xs shadow-sm">
+              Scroll
+            </kbd>{" "}
+            to zoom in/out
+          </p>
+          <p className="flex items-center text-xs leading-relaxed">
+            <span className="text-primary font-semibold mr-1.5 text-xs opacity-80">
+              ➤
+            </span>{" "}
+            Double-click text to rename elements
+          </p>
+          <p className="flex items-center text-xs leading-relaxed pt-1 mt-1 border-t border-border/30">
+            <span className="text-destructive font-semibold mr-1.5 text-xs opacity-90">
+              ➤
+            </span>{" "}
+            Press{" "}
+            <kbd className="px-1.5 py-0.5 rounded bg-muted/80 mx-1 text-xs shadow-sm">
+              Delete
+            </kbd>{" "}
+            to remove selected element
+          </p>
+        </>
+      )}
       {/* Chair Legend Section */}
       <div className="pt-2 mt-2 border-t border-border/30">
         <h4 className="text-xs font-semibold text-foreground/80 mb-1.5">
