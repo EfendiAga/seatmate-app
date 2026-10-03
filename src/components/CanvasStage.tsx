@@ -367,6 +367,8 @@ export const CanvasStage: React.FC<CanvasStageProps & { isStatic?: boolean }> = 
 
   const handleWheel = (e: Konva.KonvaEventObject<WheelEvent>) => {
     e.evt.preventDefault();
+    
+    if (!editMode) return; // Disable pinch/scroll zoom for host/guest UI
 
     const scaleBy = 1.05;
     const stage = stageRef.current;
