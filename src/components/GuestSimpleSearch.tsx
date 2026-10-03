@@ -54,63 +54,70 @@ export function GuestSimpleSearch() {
     <div className="flex flex-col items-center justify-start w-full min-h-full p-2 md:p-4 bg-gradient-to-b from-background to-muted/20 overflow-y-auto">
       <div className="w-full max-w-xl mx-auto space-y-4 mt-2 md:mt-4 animate-in fade-in slide-in-from-bottom-4 duration-700 ease-out pb-10">
         
-        {/* Header Section */}
-        <div className="text-center space-y-1">
-          <h1 className="text-xl md:text-2xl font-bold tracking-tight text-foreground">
-            Welcome to {eventTitle}
-          </h1>
-          <p className="text-muted-foreground text-sm">Find your seat to get started</p>
-        </div>
-
-        {/* Search Input */}
-        <div className="relative group">
-          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-            <Search className="h-5 w-5 text-muted-foreground group-focus-within:text-primary transition-colors" />
+        {/* Header Section (Hidden when guest is selected) */}
+        {!selectedGuest && (
+          <div className="text-center space-y-1">
+            <h1 className="text-xl md:text-2xl font-bold tracking-tight text-foreground">
+              Welcome to {eventTitle}
+            </h1>
+            <p className="text-muted-foreground text-sm">Find your seat to get started</p>
           </div>
-          <Input
-            value={searchQuery}
-            onChange={(e) => {
-              setSearchQuery(e.target.value);
-              setSelectedGuestId(null); // Reset selection on new search
-              setSearchedGuestId(null);
-            }}
-            placeholder="Enter your first or last name..."
-            className="pl-10 h-12 text-base rounded-xl border-2 border-primary/20 shadow-sm focus-visible:ring-primary focus-visible:border-primary transition-all bg-card/90 backdrop-blur-sm hover:border-primary/40"
-          />
-        </div>
+        )}
 
-        {/* Search Results */}
-        {!selectedGuest && searchQuery && filteredGuests.length > 0 && (
-          <div className="bg-card rounded-2xl shadow-xl border border-border/50 overflow-hidden animate-in slide-in-from-top-2 duration-300">
-            <div className="max-h-[300px] overflow-y-auto">
-              {filteredGuests.map((guest) => (
-                <button
-                  key={guest.id}
-                  onClick={() => {
-                    setSelectedGuestId(guest.id);
-                    setSearchedGuestId(guest.id);
-                  }}
-                  className="w-full flex items-center justify-between p-4 hover:bg-muted/50 transition-colors border-b border-border/50 last:border-0 text-left group"
-                >
-                  <div className="flex items-center space-x-3">
-                    <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center text-primary group-hover:scale-110 transition-transform">
-                      <User size={20} />
-                    </div>
-                    <span className="font-medium text-lg">{`${guest.firstName} ${guest.lastName}`.trim() || "Unnamed Guest"}</span>
-                  </div>
-                  <ArrowRight size={20} className="text-muted-foreground group-hover:text-primary group-hover:translate-x-1 transition-all" />
-                </button>
-              ))}
+        {/* Search Input (Hidden when guest is selected) */}
+        {!selectedGuest && (
+          <div className="relative group">
+            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <Search className="h-5 w-5 text-muted-foreground group-focus-within:text-primary transition-colors" />
             </div>
+            <Input
+              value={searchQuery}
+              onChange={(e) => {
+                setSearchQuery(e.target.value);
+                setSelectedGuestId(null);
+                setSearchedGuestId(null);
+              }}
+              placeholder="Enter your first or last name..."
+              className="pl-10 h-12 text-base rounded-xl border-2 border-primary/20 shadow-sm focus-visible:ring-primary focus-visible:border-primary transition-all bg-card/90 backdrop-blur-sm hover:border-primary/40"
+            />
           </div>
         )}
 
-        {!selectedGuest && searchQuery && filteredGuests.length === 0 && (
-          <div className="text-center p-8 bg-card rounded-2xl shadow-sm border border-border/50">
-            <p className="text-muted-foreground text-lg">No guest found with that name.</p>
-            <p className="text-sm text-muted-foreground mt-2">Try searching by your first or last name only.</p>
-          </div>
-        )}
+        {/* Search Results (Absolutely positioned to not push content down) */}
+        <div className="relative z-50">
+          {!selectedGuest && searchQuery && filteredGuests.length > 0 && (
+            <div className="absolute top-0 left-0 right-0 bg-card rounded-2xl shadow-2xl border border-border/80 overflow-hidden animate-in slide-in-from-top-2 duration-300">
+              <div className="max-h-[300px] overflow-y-auto">
+                {filteredGuests.map((guest) => (
+                  <button
+                    key={guest.id}
+                    onClick={() => {
+                      setSelectedGuestId(guest.id);
+                      setSearchedGuestId(guest.id);
+                      setSearchQuery(""); // Clear search to hide dropdown
+                    }}
+                    className="w-full flex items-center justify-between p-4 hover:bg-muted/50 transition-colors border-b border-border/50 last:border-0 text-left group"
+                  >
+                    <div className="flex items-center space-x-3">
+                      <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center text-primary group-hover:scale-110 transition-transform">
+                        <User size={20} />
+                      </div>
+                      <span className="font-medium text-lg">{`${guest.firstName} ${guest.lastName}`.trim() || "Unnamed Guest"}</span>
+                    </div>
+                    <ArrowRight size={20} className="text-muted-foreground group-hover:text-primary group-hover:translate-x-1 transition-all" />
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {!selectedGuest && searchQuery && filteredGuests.length === 0 && (
+            <div className="absolute top-0 left-0 right-0 text-center p-8 bg-card rounded-2xl shadow-xl border border-border/80">
+              <p className="text-muted-foreground text-lg">No guest found with that name.</p>
+              <p className="text-sm text-muted-foreground mt-2">Try searching by your first or last name only.</p>
+            </div>
+          )}
+        </div>
 
         {/* Selected Guest Details */}
         {selectedGuest && (
