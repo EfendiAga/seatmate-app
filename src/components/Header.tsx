@@ -496,18 +496,20 @@ export const Header: React.FC<HeaderProps> = ({
             </Popover>
           ) : null}
 
-          <div className="bg-card/80 backdrop-blur-sm border border-border/30 rounded-lg px-4 py-2.5 shadow-sm transition-all hover:shadow-md">
-            <div className="flex items-center">
-              <Users
-                size={18}
-                className="mr-2 text-primary/80"
-                strokeWidth={1.5}
-              />
-              <span className="font-medium text-foreground/90">
-                {totalGuests} {totalGuests === 1 ? "Guest" : "Guests"}
-              </span>
+          {editMode && (
+            <div className="bg-card/80 backdrop-blur-sm border border-border/30 rounded-lg px-4 py-2.5 shadow-sm transition-all hover:shadow-md">
+              <div className="flex items-center">
+                <Users
+                  size={18}
+                  className="mr-2 text-primary/80"
+                  strokeWidth={1.5}
+                />
+                <span className="font-medium text-foreground/90">
+                  {totalGuests} {totalGuests === 1 ? "Guest" : "Guests"}
+                </span>
+              </div>
             </div>
-          </div>
+          )}
 
           {editMode && (
             <TooltipProvider>

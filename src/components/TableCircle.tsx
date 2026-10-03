@@ -257,6 +257,30 @@ const TableCircleContent: React.FC<{
 
   const isHighlighted = shape.id === currentlyHoveredTableId || hasHighlightedGuest;
 
+  const pulseRef = useRef<any>(null);
+
+  useEffect(() => {
+    if (!hasHighlightedGuest || !pulseRef.current) return;
+    
+    const node = pulseRef.current;
+    let anim = new Konva.Animation((frame) => {
+      if (!frame) return;
+      const scale = 1 + Math.sin(frame.time / 200) * 0.15;
+      const opacity = 0.5 + Math.sin(frame.time / 200) * 0.4;
+      node.scale({ x: scale, y: scale });
+      node.opacity(opacity);
+    }, node.getLayer());
+
+    anim.start();
+    return () => {
+      anim.stop();
+      if (pulseRef.current) {
+        pulseRef.current.scale({ x: 1, y: 1 });
+        pulseRef.current.opacity(0);
+      }
+    };
+  }, [hasHighlightedGuest]);
+
   const handleDragStart = (e: Konva.KonvaEventObject<DragEvent>) => {
     setIsDragging(true);
     // Prevent stage drag if Alt is pressed when starting shape drag
@@ -403,13 +427,43 @@ const TableCircleContent: React.FC<{
           if (stage) stage.container().style.cursor = "default";
         }}
       >
+          {/* Pulsating Highlight Overlay */}
+          {hasHighlightedGuest && (!shape.tableShape || shape.tableShape === "round") && (
+            <Circle
+              ref={pulseRef}
+              radius={shape.radius || MIN_TABLE_RADIUS}
+              fill="transparent"
+              stroke={COLORS.highlightedTableStroke}
+              strokeWidth={8}
+              opacity={0}
+              listening={false}
+            />
+          )}
+          {hasHighlightedGuest && shape.tableShape === "rectangular" && (
+            <Rect
+              ref={pulseRef}
+              x={0}
+              y={0}
+              offsetX={(shape.width || 120) / 2}
+              offsetY={(shape.height || 60) / 2}
+              width={shape.width || 120}
+              height={shape.height || 60}
+              cornerRadius={8}
+              fill="transparent"
+              stroke={COLORS.highlightedTableStroke}
+              strokeWidth={8}
+              opacity={0}
+              listening={false}
+            />
+          )}
+
                   {/* Main Table Shape */}
           {(!shape.tableShape || shape.tableShape === "round") && (
             <Circle
               radius={shape.radius || MIN_TABLE_RADIUS}
               fill={COLORS.tableFill}
               stroke={isHighlighted ? COLORS.highlightedTableStroke : COLORS.tableStroke}
-              strokeWidth={isHighlighted ? COLORS.highlightedTableStrokeWidth : 2}
+              strokeWidth={isHighlighted ? COLORS.highlightedTableStrokeWidth : 3}
               shadowBlur={isSelected ? 12 : 6}
               shadowColor={COLORS.shadowColor}
               shadowOpacity={isSelected ? 0.4 : 0.2}
@@ -427,7 +481,7 @@ const TableCircleContent: React.FC<{
               cornerRadius={8}
               fill={COLORS.tableFill}
               stroke={isHighlighted ? COLORS.highlightedTableStroke : COLORS.tableStroke}
-              strokeWidth={isHighlighted ? COLORS.highlightedTableStrokeWidth : 2}
+              strokeWidth={isHighlighted ? COLORS.highlightedTableStrokeWidth : 3}
               shadowBlur={isSelected ? 12 : 6}
               shadowColor={COLORS.shadowColor}
               shadowOpacity={isSelected ? 0.4 : 0.2}
@@ -440,7 +494,7 @@ const TableCircleContent: React.FC<{
                   {/* Centered Table Number */}
           <Text
             text={`Table ${shape.number}`}
-            fontSize={Math.max(10 * scaleFactor, 16 * scaleFactor)}
+            fontSize={Math.max(12 * scaleFactor, 18 * scaleFactor)}
             fontFamily="'Inter', sans-serif"
             fill={COLORS.tableTextPrimary}
             fontStyle="bold"
