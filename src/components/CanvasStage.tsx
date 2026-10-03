@@ -245,26 +245,8 @@ export const CanvasStage: React.FC<CanvasStageProps & { isStatic?: boolean }> = 
     }
   }, [baseShapes, initialFitDone, fitContentToView, stageSize, isStatic]);
 
-  // Effect to pan to searched guest
-  useEffect(() => {
-    if (searchedGuestId) {
-      const guest = guests.find(g => g.id === searchedGuestId);
-      if (guest && guest.tableId) {
-        const table = baseShapes.find(s => s.id === guest.tableId);
-        if (table) {
-           const scale = 1.2; // Slight zoom in
-           setStageInternalScale(scale);
-           setGlobalStageScale(scale);
-           setStagePos({
-             x: stageSize.width / 2 - table.x * scale,
-             y: stageSize.height / 2 - table.y * scale,
-           });
-        }
-      }
-    } else if (isStatic && initialFitDone) {
-      fitContentToView();
-    }
-  }, [searchedGuestId, guests, baseShapes, stageSize, setGlobalStageScale, isStatic, initialFitDone, fitContentToView]);
+  // No longer auto-zooming to searched guest to preserve the full overview.
+  // The table glow (implemented in TableCircle) is sufficient for highlighting.
 
   // Effect to handle window resizing and set initial stage size
   useEffect(() => {
