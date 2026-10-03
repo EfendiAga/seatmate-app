@@ -51,8 +51,8 @@ export function GuestSimpleSearch() {
   }, [assignedTable, guests, selectedGuest]);
 
   return (
-    <div className="flex flex-col items-center justify-start w-full min-h-full p-2 md:p-4 bg-gradient-to-b from-background to-muted/20 overflow-y-auto">
-      <div className="w-full max-w-xl mx-auto space-y-4 mt-2 md:mt-4 animate-in fade-in slide-in-from-bottom-4 duration-700 ease-out pb-10">
+    <div className="flex flex-col items-center justify-start w-full h-full p-2 md:p-4 bg-gradient-to-b from-background to-muted/20 overflow-hidden">
+      <div className="w-full max-w-xl mx-auto space-y-4 mt-2 md:mt-4 flex-shrink-0 animate-in fade-in slide-in-from-bottom-4 duration-700 ease-out z-10">
         
         {/* Header Section (Hidden when guest is selected) */}
         {!selectedGuest && (
@@ -153,17 +153,16 @@ export function GuestSimpleSearch() {
             </div>
           </div>
         )}
+      </div>
 
-        {/* Static Floor Plan */}
-        <div className="mt-4 bg-card rounded-2xl shadow-lg border border-border/50 overflow-hidden">
-          <div className="p-3 bg-muted/30 border-b border-border/50">
-            <h3 className="text-base font-semibold text-center">Floor Plan Overview</h3>
-          </div>
-          <div className="w-full h-[60vh] md:h-[70vh] relative pointer-events-none">
-            <SortedCanvasStageAdapter shapeAtoms={shapeAtoms} isStatic={true} />
-          </div>
+      {/* Static Floor Plan */}
+      <div className="w-full max-w-xl mx-auto mt-4 bg-card rounded-2xl shadow-lg border border-border/50 overflow-hidden flex-grow flex flex-col min-h-[250px]">
+        <div className="p-3 bg-muted/30 border-b border-border/50 flex-shrink-0">
+          <h3 className="text-base font-semibold text-center">Floor Plan Overview</h3>
         </div>
-
+        <div className="w-full flex-grow relative pointer-events-none">
+          <SortedCanvasStageAdapter shapeAtoms={shapeAtoms} isStatic={true} />
+        </div>
       </div>
     </div>
   );

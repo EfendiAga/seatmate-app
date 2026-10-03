@@ -94,6 +94,7 @@ interface HeaderProps {
   attemptUnlock: (
     pin: string,
   ) => Promise<{ success: boolean; message?: string }>;
+  lockVenue: () => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -110,6 +111,7 @@ export const Header: React.FC<HeaderProps> = ({
   onToggleMobileSidebar,
   isMobileSidebarOpen,
   attemptUnlock,
+  lockVenue,
 }) => {
   const [eventTitle, setEventTitle] = useAtom(eventTitleAtom);
   const [canUndo, undo] = useAtom(undoAtom);
@@ -442,7 +444,7 @@ export const Header: React.FC<HeaderProps> = ({
                     <Button 
                       variant="outline" 
                       size="icon" 
-                      onClick={() => setEditMode(false)}
+                      onClick={() => lockVenue()}
                       className="h-9 w-9 bg-card hover:bg-destructive/10 hover:text-destructive border-border transition-colors"
                       aria-label="Lock / Exit Edit Mode"
                     >

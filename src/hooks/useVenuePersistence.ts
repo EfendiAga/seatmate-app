@@ -435,6 +435,14 @@ export const useVenuePersistence = () => {
     updateError: updateError, // Expose server error from mutation
     editMode: currentEditMode,
     attemptUnlock,
+    lockVenue: () => {
+      if (slug) {
+        storage.removeEditModeStorage(slug);
+        storage.removePin(slug);
+      }
+      setEditMode(false);
+      setVenuePin(null);
+    },
   };
 };
 

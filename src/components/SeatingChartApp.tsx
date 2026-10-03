@@ -58,6 +58,7 @@ export const SeatingChartApp = () => {
     updateError,
     editMode,
     attemptUnlock,
+    lockVenue,
   } = useVenuePersistence();
 
   const [isSheetOpen, setIsSheetOpen] = useState(false);
@@ -443,6 +444,7 @@ export const SeatingChartApp = () => {
         onToggleMobileSidebar={() => setIsSheetOpen((prev) => !prev)}
         isMobileSidebarOpen={isSheetOpen}
         attemptUnlock={attemptUnlock}
+        lockVenue={lockVenue}
       />
       {editMode && (
         <Toolbar 
