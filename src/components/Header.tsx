@@ -40,6 +40,7 @@ import {
   eventTitleAtom, undoAtom, redoAtom,
   editModeAtom,
   venuePinAtom,
+  hostPinAtom,
   pinEntryAtom,
   baseShapesAtom,
   guestsAtom,
@@ -477,7 +478,7 @@ export const Header: React.FC<HeaderProps> = ({
                   <div className="flex space-x-2">
                     <Input
                       type="password"
-                      maxLength={4}
+                      maxLength={7}
                       placeholder="PIN"
                       value={pinEntry}
                       onChange={(e) => setPinEntry(e.target.value.replace(/\D/g, ""))}
@@ -592,5 +593,7 @@ export const Header: React.FC<HeaderProps> = ({
     </header>
   );
 };
+
+
 
 

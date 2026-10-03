@@ -122,6 +122,8 @@ export const useVenuePersistence = () => {
   const setTableCounter = useSetAtom(tableCounterAtom);
   const setEditMode = useSetAtom(editModeAtom);
   const setVenuePin = useSetAtom(venuePinAtom);
+  const setHostMode = useSetAtom(hostModeAtom);
+  const setHostPin = useSetAtom(hostPinAtom);
   const currentEditMode = useAtomValue(editModeAtom);
   const [currentPin] = useAtom(venuePinAtom); // Use useAtom to get value, ignore setter
 
@@ -462,7 +464,7 @@ export const useVenuePersistence = () => {
       setEditMode(false);
       setVenuePin(null);
       setHostMode(false);
-      setHostPinState(null);
+      setHostPin(null);
     },
   };
 };
