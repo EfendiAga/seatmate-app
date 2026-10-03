@@ -14,6 +14,8 @@ import {
   tableCounterAtom,
   editModeAtom,
   venuePinAtom,
+  hostModeAtom,
+  hostPinAtom,
 } from "@/lib/atoms"; // Use @ alias for src/
 import {
   useVenueQuery,
@@ -88,6 +90,21 @@ const storage = {
   setEditModeStorage: (slug: string, enabled: boolean): void =>
     localStorage.setItem(storage.getEditModeKey(slug), String(enabled)),
   removeEditModeStorage: (slug: string): void =>
+    localStorage.removeItem(storage.getEditModeKey(slug)),
+  getHostModeKey: (slug: string) => `venue-${slug}-hostMode`,
+  getHostModeStorage: (slug: string): boolean =>
+    localStorage.getItem(storage.getHostModeKey(slug)) === "true",
+  setHostModeStorage: (slug: string, enabled: boolean): void =>
+    localStorage.setItem(storage.getHostModeKey(slug), String(enabled)),
+  removeHostModeStorage: (slug: string): void =>
+    localStorage.removeItem(storage.getHostModeKey(slug)),
+  getHostPinKey: (slug: string) => `venue-${slug}-hostPin`,
+  getHostPin: (slug: string): string | null => localStorage.getItem(storage.getHostPinKey(slug)),
+  setHostPin: (slug: string, pin: string): void =>
+    localStorage.setItem(storage.getHostPinKey(slug), pin),
+  removeHostPin: (slug: string): void =>
+    localStorage.removeItem(storage.getHostPinKey(slug)),
+  _dummy: () =>
     localStorage.removeItem(storage.getEditModeKey(slug)),
 };
 // ------------------------
@@ -439,10 +456,17 @@ export const useVenuePersistence = () => {
       if (slug) {
         storage.removeEditModeStorage(slug);
         storage.removePin(slug);
+        storage.removeHostModeStorage(slug);
+        storage.removeHostPin(slug);
       }
       setEditMode(false);
       setVenuePin(null);
+      setHostMode(false);
+      setHostPinState(null);
     },
   };
 };
+
+
+
 

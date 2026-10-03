@@ -59,6 +59,8 @@ export const eventTitleAtom = atom<string>("My Event");
 // --- PIN and Edit Mode Atoms ---
 // Reverted to simple primitive atom definitions
 export const editModeAtom = atom<boolean>(false);
+export const hostModeAtom = atom<boolean>(false);
+export const hostPinAtom = atom<string | null>(null);
 export const venuePinAtom = atom<string | null>(null);
 export const pinEntryAtom = atom<string>("");
 

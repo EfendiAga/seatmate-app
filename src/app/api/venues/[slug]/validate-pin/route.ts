@@ -17,7 +17,9 @@ export async function POST(req: Request, props: { params: Promise<{ slug: string
     }
     
     if (venue.pin === pin) {
-      return NextResponse.json({ success: true });
+      return NextResponse.json({ success: true, role: 'admin', hostPin: venue.hostPin });
+    } else if (venue.hostPin && venue.hostPin === pin) {
+      return NextResponse.json({ success: true, role: 'host' });
     } else {
       return NextResponse.json({ success: false, message: 'Invalid PIN' }, { status: 403 });
     }

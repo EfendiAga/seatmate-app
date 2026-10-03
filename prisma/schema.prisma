@@ -10,6 +10,7 @@ datasource db {
 model Venue {
   slug      String   @id
   pin       String
+  hostPin   String?
   venueData Json
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

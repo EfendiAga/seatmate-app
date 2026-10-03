@@ -35,7 +35,8 @@ export async function PUT(req: Request, props: { params: Promise<{ slug: string 
         where: { slug: params.slug },
         data: {
           venueData: data.venue_data,
-          pin: data.pin || existing.pin
+          pin: data.pin || existing.pin,
+          hostPin: data.hostPin !== undefined ? data.hostPin : existing.hostPin
         }
       });
     } else {
@@ -43,6 +44,7 @@ export async function PUT(req: Request, props: { params: Promise<{ slug: string 
         data: {
           slug: params.slug,
           pin: data.pin || '1234',
+          hostPin: data.hostPin || '4321',
           venueData: data.venue_data
         }
       });

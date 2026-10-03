@@ -118,6 +118,7 @@ export const Header: React.FC<HeaderProps> = ({
   const [canRedo, redo] = useAtom(redoAtom);
   const [editMode, setEditMode] = useAtom(editModeAtom);
   const venuePin = useAtomValue(venuePinAtom);
+  const hostPin = useAtomValue(hostPinAtom);
   const [pinEntry, setPinEntry] = useAtom(pinEntryAtom);
   const [isPinSubmitting, setIsPinSubmitting] = useState(false);
   const baseShapes = useAtomValue(baseShapesAtom);
@@ -591,3 +592,5 @@ export const Header: React.FC<HeaderProps> = ({
     </header>
   );
 };
+
+
