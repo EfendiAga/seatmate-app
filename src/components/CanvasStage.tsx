@@ -110,8 +110,12 @@ export const CanvasStage: React.FC<CanvasStageProps & { isStatic?: boolean }> = 
   const [initialFitDone, setInitialFitDone] = useState(false);
   
   // Refs for touch pinch-to-zoom
-  const lastCenter = useRef<{ x: number, y: number } | null>(null);
-  const lastDist = useRef<number>(0);
+  const touchState = useRef<{
+    initialDist: number;
+    initialScale: number;
+    initialCenter: { x: number; y: number };
+    initialPos: { x: number; y: number };
+  } | null>(null);
   const isVenueLocked = useAtomValue(venueSpaceLockedAtom); // Get venue lock state
   const editMode = useAtomValue(editModeAtom);
 
@@ -422,60 +426,61 @@ export const CanvasStage: React.FC<CanvasStageProps & { isStatic?: boolean }> = 
     const touch2 = e.evt.touches[1];
 
     if (touch1 && touch2) {
-      // if the stage was under Konva's drag&drop, we need to stop it
-      if (stageRef.current?.isDragging()) {
-        stageRef.current.stopDrag();
+      const stage = stageRef.current;
+      if (!stage) return;
+
+      if (stage.isDragging()) {
+        stage.stopDrag();
       }
 
       const p1 = { x: touch1.clientX, y: touch1.clientY };
       const p2 = { x: touch2.clientX, y: touch2.clientY };
 
-      if (!lastCenter.current) {
-        lastCenter.current = getCenter(p1, p2);
+      const dist = getDistance(p1, p2);
+      const center = getCenter(p1, p2);
+
+      if (!touchState.current) {
+        touchState.current = {
+          initialDist: dist,
+          initialScale: stage.scaleX(),
+          initialCenter: center,
+          initialPos: stage.position(),
+        };
         return;
       }
-      const newCenter = getCenter(p1, p2);
-      const dist = getDistance(p1, p2);
 
-      if (!lastDist.current) {
-        lastDist.current = dist;
-      }
+      const { initialDist, initialScale, initialCenter, initialPos } = touchState.current;
 
-      const stage = stageRef.current;
-      if (!stage) return;
+      const scale = initialScale * (dist / initialDist);
+      const newScale = Math.max(0.1, Math.min(scale, 10)); // Clamp scale
 
-      // Calculate relative scale
-      const distRatio = dist / lastDist.current;
-      const oldScale = stage.scaleX();
-      
-      const newScale = Math.max(0.1, Math.min(oldScale * distRatio, 10)); // Clamp scale
-
-      // point to zoom to
+      // pointTo is the unscaled local coordinate of the initial pinch center
       const pointTo = {
-        x: (newCenter.x - stage.x()) / oldScale,
-        y: (newCenter.y - stage.y()) / oldScale,
+        x: (initialCenter.x - initialPos.x) / initialScale,
+        y: (initialCenter.y - initialPos.y) / initialScale,
       };
 
+      // We want to translate the stage so that the initial pointTo local coordinate
+      // is now under the new pinch center on the screen.
+      const newPos = {
+        x: center.x - pointTo.x * newScale,
+        y: center.y - pointTo.y * newScale,
+      };
+
+      // Optimistically update Konva for perfectly smooth 60fps native feel
+      stage.scale({ x: newScale, y: newScale });
+      stage.position(newPos);
+      stage.batchDraw();
+
+      // Sync with React state
       setStageInternalScale(newScale);
       setGlobalStageScale(newScale);
-
-      const dx = newCenter.x - lastCenter.current.x;
-      const dy = newCenter.y - lastCenter.current.y;
-
-      const newPos = {
-        x: newCenter.x - pointTo.x * newScale + dx,
-        y: newCenter.y - pointTo.y * newScale + dy,
-      };
-
       setStagePos(newPos);
-      lastDist.current = dist;
-      lastCenter.current = newCenter;
     }
   };
 
   const handleTouchEnd = () => {
-    lastDist.current = 0;
-    lastCenter.current = null;
+    touchState.current = null;
   };
 
   const handleStageMouseDown = (e: Konva.KonvaEventObject<MouseEvent>) => {
