@@ -206,13 +206,24 @@ export const useVenuePersistence = () => {
       const localData = storage.getVenueData(slug);
       const localPin = storage.getPin(slug);
       const localEditMode = storage.getEditModeStorage(slug);
+      const localHostPin = storage.getHostPin(slug);
+      const localHostMode = storage.getHostModeStorage(slug);
 
       if (localPin && localEditMode) {
         setVenuePin(localPin);
         setEditMode(true);
+        if (localHostPin) setHostPin(localHostPin);
+        if (localHostMode) setHostMode(true);
+      } else if (localHostPin && localHostMode) {
+        setHostPin(localHostPin);
+        setHostMode(true);
+        setEditMode(false);
+        setVenuePin(null);
       } else {
         setEditMode(false); // Default to view-only if no local pin/edit status
         setVenuePin(null);
+        setHostMode(false);
+        setHostPin(null);
       }
 
       if (localData) {
@@ -241,7 +252,10 @@ export const useVenuePersistence = () => {
     setEventTitle,
     setTableCounter,
     setEditMode,
+    setEditMode,
     setVenuePin,
+    setHostPin,
+    setHostMode,
   ]);
 
   // --- Effect to Handle Data Fetched From Server ---
@@ -421,11 +435,22 @@ export const useVenuePersistence = () => {
         const validationResult = await validatePinOnServer(slug, pinAttempt);
         if (validationResult.success) {
             console.log(`Persistence Hook: PIN validation successful for ${slug}`);
-          storage.setPin(slug, pinAttempt); // Store the successfully validated PIN
-          storage.setEditModeStorage(slug, true);
-          setVenuePin(pinAttempt);
-          setEditMode(true);
-          return { success: true };
+          if (validationResult.role === 'host') {
+            storage.setHostPin(slug, pinAttempt);
+            storage.setHostModeStorage(slug, true);
+            setHostPin(pinAttempt);
+            setHostMode(true);
+          } else {
+            storage.setPin(slug, pinAttempt); // Store the successfully validated PIN
+            storage.setEditModeStorage(slug, true);
+            setVenuePin(pinAttempt);
+            setEditMode(true);
+            if (validationResult.hostPin) {
+              storage.setHostPin(slug, validationResult.hostPin);
+              setHostPin(validationResult.hostPin);
+            }
+          }
+          return { success: true, role: validationResult.role };
         } else {
           console.warn(`Persistence Hook: PIN validation failed for ${slug}: ${validationResult.message}`);
           setEditMode(false); // Ensure still in view mode
