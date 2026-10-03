@@ -311,8 +311,8 @@ const TableCircleContent: React.FC<{
     saveHistory();
     setShape((prev) => {
       if (prev.tableShape === "rectangular") {
-        const newWidth = Math.max(20, (prev.width || 120) * scaleX);
-        const newHeight = Math.max(20, (prev.height || 60) * scaleY);
+        const newWidth = Math.max(5, (prev.width || 120) * scaleX);
+        const newHeight = Math.max(5, (prev.height || 60) * scaleY);
         return {
           ...prev,
           x: node.x(),
@@ -323,10 +323,7 @@ const TableCircleContent: React.FC<{
       } else {
         const scale = (scaleX + scaleY) / 2;
         const newRadius = prev.radius * scale;
-        const clampedRadius = Math.max(
-          MIN_TABLE_RADIUS,
-          Math.min(newRadius, MAX_TABLE_RADIUS),
-        );
+        const clampedRadius = Math.max(5, newRadius); // Allow scaling down to prevent overlap
         return {
           ...prev,
           x: node.x(),
