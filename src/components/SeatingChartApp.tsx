@@ -119,7 +119,7 @@ export const SeatingChartApp = () => {
   }, [updateError, toast]);
 
     // --- Copy/Paste Logic ---
-  const copiedShapeRef = React.useRef<Shape | null>(null);
+  const copiedShapesRef = React.useRef<Shape[]>([]);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -129,12 +129,12 @@ export const SeatingChartApp = () => {
       // Copy (Ctrl+C / Cmd+C)
       if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'c') {
         if (selectedShapeIds.length > 0) {
-          const shapeToCopy = baseShapesValue.find((s) => s.id === selectedShapeIds[0]); // Only support copying first shape for now
-          if (shapeToCopy && shapeToCopy.type === 'table') {
-            copiedShapeRef.current = shapeToCopy;
+          const shapesToCopy = baseShapesValue.filter(s => selectedShapeIds.includes(s.id));
+          if (shapesToCopy.length > 0) {
+            copiedShapesRef.current = shapesToCopy;
             toast({
               title: "Copied!",
-              description: "Table copied to clipboard.",
+              description: `${shapesToCopy.length} element${shapesToCopy.length > 1 ? 's' : ''} copied.`,
               duration: 2000,
             });
           }
@@ -143,26 +143,51 @@ export const SeatingChartApp = () => {
 
       // Paste (Ctrl+V / Cmd+V)
       if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'v') {
-        if (copiedShapeRef.current) {
-          const copied = copiedShapeRef.current;
+        if (copiedShapesRef.current && copiedShapesRef.current.length > 0) {
+          const newShapes: Shape[] = [];
+          const newShapeIds: string[] = [];
           
-          let newNumber = tableCounterValue;
-          setTableCounter(c => c + 1);
+          let currentTableCounter = tableCounterValue;
+          
+          // Map old groupIds to new groupIds to maintain grouping of pasted items
+          const groupMap = new Map<string, string>();
 
-          const newTable: Table = {
-            ...copied,
-            id: "table-" + Date.now() + "-" + Math.random().toString(36).substring(2, 6),
-            number: newNumber,
-            x: copied.x + 40, // offset
-            y: copied.y + 40, // offset
-          };
+          copiedShapesRef.current.forEach(copied => {
+            const isTable = copied.type === 'table';
+            let newGroupId = copied.groupId;
+            if (copied.groupId) {
+              if (!groupMap.has(copied.groupId)) {
+                groupMap.set(copied.groupId, `group-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`);
+              }
+              newGroupId = groupMap.get(copied.groupId);
+            }
+
+            const newShape: Shape = {
+              ...copied,
+              id: (isTable ? "table-" : "venue-") + Date.now() + "-" + Math.random().toString(36).substring(2, 6),
+              x: copied.x + 40, // offset
+              y: copied.y + 40, // offset
+              groupId: newGroupId,
+            };
+            
+            if (isTable) {
+              (newShape as Table).number = currentTableCounter++;
+            }
+            
+            newShapes.push(newShape);
+            newShapeIds.push(newShape.id);
+          });
           
-          setBaseShapes(prev => [...prev, newTable]);
-          setSelectedShapeIds([newTable.id]);
+          if (currentTableCounter !== tableCounterValue) {
+            setTableCounter(currentTableCounter);
+          }
+
+          setBaseShapes(prev => [...prev, ...newShapes]);
+          setSelectedShapeIds(newShapeIds);
           
           toast({
             title: "Pasted!",
-            description: "Table pasted to canvas.",
+            description: `${newShapes.length} element${newShapes.length > 1 ? 's' : ''} pasted.`,
             duration: 2000,
           });
         }
