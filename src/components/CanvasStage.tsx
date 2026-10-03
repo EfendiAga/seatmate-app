@@ -52,7 +52,8 @@ const AtomRenderer: React.FC<{
   highlightedGuestId: string | null;
   registerRef: (guestId: string | null, node: Konva.Group | null) => void; // Add prop
   registerShapeRef: (id: string, node: Konva.Node | null) => void;
-}> = ({ shapeAtom, highlightedGuestId, registerRef, registerShapeRef }) => {
+  isStatic?: boolean;
+}> = ({ shapeAtom, highlightedGuestId, registerRef, registerShapeRef, isStatic }) => {
   const shape = useAtomValue(shapeAtom);
 
   if (shape.type === "venue") {
@@ -67,6 +68,7 @@ const AtomRenderer: React.FC<{
         highlightedGuestId={highlightedGuestId}
         registerRef={registerRef}
         registerShapeRef={registerShapeRef}
+        isStatic={isStatic}
       />
     );
   }
@@ -525,6 +527,7 @@ export const CanvasStage: React.FC<CanvasStageProps & { isStatic?: boolean }> = 
                   highlightedGuestId={hoveredGuestId || searchedGuestId}
                   registerRef={registerChairRef} // Pass down register function
                   registerShapeRef={registerShapeRef}
+                  isStatic={isStatic}
                 />
               </React.Fragment>
             ))}

@@ -338,16 +338,17 @@ export const Header: React.FC<HeaderProps> = ({
         </div>
 
         {/* Item 3: Middle section - Event Title */}
-        <div className="flex-grow max-w-[18rem] mr-2 ml-2 hidden md:block lg:order-3">
-          <Input
-            value={eventTitle}
-            onChange={(e) => setEventTitle(e.target.value)}
-            className="h-10 bg-card/60 border-border/30 focus:border-primary/50 focus:bg-card/80 text-xl font-bold text-center"
-            placeholder="Enter Event Title"
-            aria-label="Event Title"
-            disabled={!editMode}
-          />
-        </div>
+        {editMode && (
+          <div className="flex-grow max-w-[18rem] mr-2 ml-2 hidden md:block lg:order-3">
+            <Input
+              value={eventTitle}
+              onChange={(e) => setEventTitle(e.target.value)}
+              className="h-10 bg-card/60 border-border/30 focus:border-primary/50 focus:bg-card/80 text-xl font-bold text-center"
+              placeholder="Enter Event Title"
+              aria-label="Event Title"
+            />
+          </div>
+        )}
 
         {/* Right section - Stats and actions - ensure this section doesn't cause overflow with new button */}
         <div className="flex items-center space-x-2 sm:space-x-3 flex-shrink-0 order-2 lg:order-4">
@@ -571,16 +572,17 @@ export const Header: React.FC<HeaderProps> = ({
         </div>
 
         {/* Event Title for smaller screens (md:hidden ensures it does not overlap with the md:block version) */}
-        <div className="w-full mt-3 md:hidden order-5">
-          <Input
-            value={eventTitle}
-            onChange={(e) => setEventTitle(e.target.value)}
-            className="h-10 bg-card/60 border-border/30 focus:border-primary/50 focus:bg-card/80 text-xl font-bold text-center"
-            placeholder="Enter Event Title"
-            aria-label="Event Title"
-            disabled={!editMode}
-          />
-        </div>
+        {editMode && (
+          <div className="w-full mt-3 md:hidden order-5">
+            <Input
+              value={eventTitle}
+              onChange={(e) => setEventTitle(e.target.value)}
+              className="h-10 bg-card/60 border-border/30 focus:border-primary/50 focus:bg-card/80 text-xl font-bold text-center"
+              placeholder="Enter Event Title"
+              aria-label="Event Title"
+            />
+          </div>
+        )}
       </div>
     </header>
   );

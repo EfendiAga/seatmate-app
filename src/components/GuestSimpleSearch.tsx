@@ -56,13 +56,10 @@ export function GuestSimpleSearch() {
         
         {/* Header Section */}
         <div className="text-center space-y-1">
-          <Badge variant="secondary" className="px-3 py-1 bg-primary/10 text-primary hover:bg-primary/20 transition-colors">
-            Welcome to
-          </Badge>
-          <h1 className="text-2xl md:text-4xl font-extrabold tracking-tight text-foreground bg-clip-text text-transparent bg-gradient-to-r from-primary to-primary/60 pb-1">
-            {eventTitle}
+          <h1 className="text-xl md:text-2xl font-bold tracking-tight text-foreground">
+            Welcome to {eventTitle}
           </h1>
-          <p className="text-muted-foreground text-sm">Find your seat to get started.</p>
+          <p className="text-muted-foreground text-sm">Find your seat to get started</p>
         </div>
 
         {/* Search Input */}
@@ -185,7 +182,7 @@ export function GuestSimpleSearch() {
           <div className="p-3 bg-muted/30 border-b border-border/50">
             <h3 className="text-base font-semibold text-center">Floor Plan Overview</h3>
           </div>
-          <div className="w-full h-[350px] md:h-[500px] relative pointer-events-none">
+          <div className="w-full h-[60vh] md:h-[70vh] relative pointer-events-none">
             <SortedCanvasStageAdapter shapeAtoms={shapeAtoms} isStatic={true} />
           </div>
         </div>

@@ -25,6 +25,7 @@ interface TableCircleProps {
   highlightedGuestId?: string | null;
   registerRef?: (guestId: string | null, node: Konva.Group | null) => void;
   registerShapeRef?: (id: string, node: Konva.Group | null) => void;
+  isStatic?: boolean;
 }
 
 const MIN_CAPACITY = 0;
@@ -85,7 +86,8 @@ const TableCircleContent: React.FC<{
   highlightedGuestId?: string | null;
   registerRef?: (guestId: string | null, node: Konva.Group | null) => void;
   registerShapeRef?: (id: string, node: Konva.Group | null) => void;
-}> = ({ shapeAtom, highlightedGuestId, registerRef, registerShapeRef }) => {
+  isStatic?: boolean;
+}> = ({ shapeAtom, highlightedGuestId, registerRef, registerShapeRef, isStatic = false }) => {
   const [shape, setShape] = useAtom(shapeAtom);
   const saveHistory = useSetAtom(saveHistoryAtom);
   const [selectedShapeIds, setSelectedShapeIds] = useAtom(selectedShapeIdsAtom);
@@ -458,7 +460,7 @@ const TableCircleContent: React.FC<{
         
 
         {/* Chairs */}
-        {chairPositions.map((pos, index) => {
+        {!isStatic && chairPositions.map((pos, index) => {
           const guestId = guestMap.get(`${shape.id}---${index}`) || null;
 
           return (
@@ -613,6 +615,7 @@ export const TableCircle: React.FC<TableCircleProps> = ({
   highlightedGuestId,
   registerRef,
   registerShapeRef,
+  isStatic = false,
 }) => {
   const shapeValue = useAtomValue(shapeAtom);
 
@@ -626,6 +629,7 @@ export const TableCircle: React.FC<TableCircleProps> = ({
       highlightedGuestId={highlightedGuestId}
       registerRef={registerRef}
       registerShapeRef={registerShapeRef}
+      isStatic={isStatic}
     />
   );
 };
