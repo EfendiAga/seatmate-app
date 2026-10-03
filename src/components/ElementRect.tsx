@@ -18,8 +18,8 @@ import { useTheme } from "@/components/ThemeProvider";
 
 // Direct color values for light mode
 const LIGHT_COLORS = {
-  venueSpaceFill: "rgba(242, 234, 218, 0.1)", // very light beige, translucent
-  venueSpaceStroke: "#8A6E4B", // dark brown for venue outline
+  venueSpaceFill: "#FFFFFF", // white plain
+  venueSpaceStroke: "#E2E8F0", // subtle light gray
   elementFill: "rgba(200, 167, 155, 0.2)", // muted terracotta, translucent
   elementStroke: "#C8A79B", // muted terracotta
   elementText: "#3C3226", // rich dark brown
@@ -29,8 +29,8 @@ const LIGHT_COLORS = {
 
 // Direct color values for dark mode
 const DARK_COLORS = {
-  venueSpaceFill: "rgba(76, 88, 100, 0.1)", // blue-grey, translucent
-  venueSpaceStroke: "#BE9467", // gold/ochre for venue outline
+  venueSpaceFill: "#1F2937", // plain dark gray
+  venueSpaceStroke: "#374151", // subtle dark border
   elementFill: "rgba(100, 110, 120, 0.2)", // blue-grey, translucent
   elementStroke: "#A3B097", // lighter sage
   elementText: "#EAE3D4", // soft warm beige
@@ -201,7 +201,7 @@ const ElementRectContent: React.FC<{
         onDragStart={handleDragStart}
         onDragEnd={handleDragEnd}
         onTransformEnd={handleTransformEnd}
-        listening={!isVenueSpace || isSelected}
+        listening={!isVenueSpace || (!isVenueLocked && editMode)}
       >
         <Rect
           width={shape.width}
@@ -211,7 +211,7 @@ const ElementRectContent: React.FC<{
           strokeWidth={strokeWidth}
           cornerRadius={isVenueSpace ? 8 : 4}
           perfectDrawEnabled={false}
-          listening={!isVenueSpace || isSelected}
+          listening={!isVenueSpace || (!isVenueLocked && editMode)}
           shadowBlur={isSelected ? 12 : 6}
           shadowColor={COLORS.selectedShadow}
           shadowOpacity={isSelected ? 0.4 : 0.15}

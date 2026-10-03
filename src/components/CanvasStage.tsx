@@ -504,6 +504,7 @@ export const CanvasStage: React.FC<CanvasStageProps & { isStatic?: boolean }> = 
               <ElementRect
                 key={`venue-space-${shapeAtom.toString()}`}
                 shapeAtom={shapeAtom}
+                registerShapeRef={registerShapeRef}
               />
             ))}
 
