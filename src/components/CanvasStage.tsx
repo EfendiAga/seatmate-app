@@ -108,6 +108,10 @@ export const CanvasStage: React.FC<CanvasStageProps & { isStatic?: boolean }> = 
   const searchedGuestId = useAtomValue(searchedGuestIdAtom);
   const guests = useAtomValue(guestsAtom);
   const [initialFitDone, setInitialFitDone] = useState(false);
+  
+  // Refs for touch pinch-to-zoom
+  const lastCenter = useRef<{ x: number, y: number } | null>(null);
+  const lastDist = useRef<number>(0);
   const isVenueLocked = useAtomValue(venueSpaceLockedAtom); // Get venue lock state
   const editMode = useAtomValue(editModeAtom);
 
@@ -401,6 +405,79 @@ export const CanvasStage: React.FC<CanvasStageProps & { isStatic?: boolean }> = 
     setStagePos(newPos);
   };
 
+  const getDistance = (p1: { x: number; y: number }, p2: { x: number; y: number }) => {
+    return Math.sqrt(Math.pow(p2.x - p1.x, 2) + Math.pow(p2.y - p1.y, 2));
+  };
+
+  const getCenter = (p1: { x: number; y: number }, p2: { x: number; y: number }) => {
+    return {
+      x: (p1.x + p2.x) / 2,
+      y: (p1.y + p2.y) / 2,
+    };
+  };
+
+  const handleTouchMove = (e: Konva.KonvaEventObject<TouchEvent>) => {
+    e.evt.preventDefault();
+    const touch1 = e.evt.touches[0];
+    const touch2 = e.evt.touches[1];
+
+    if (touch1 && touch2) {
+      // if the stage was under Konva's drag&drop, we need to stop it
+      if (stageRef.current?.isDragging()) {
+        stageRef.current.stopDrag();
+      }
+
+      const p1 = { x: touch1.clientX, y: touch1.clientY };
+      const p2 = { x: touch2.clientX, y: touch2.clientY };
+
+      if (!lastCenter.current) {
+        lastCenter.current = getCenter(p1, p2);
+        return;
+      }
+      const newCenter = getCenter(p1, p2);
+      const dist = getDistance(p1, p2);
+
+      if (!lastDist.current) {
+        lastDist.current = dist;
+      }
+
+      const stage = stageRef.current;
+      if (!stage) return;
+
+      // Calculate relative scale
+      const distRatio = dist / lastDist.current;
+      const oldScale = stage.scaleX();
+      
+      const newScale = Math.max(0.1, Math.min(oldScale * distRatio, 10)); // Clamp scale
+
+      // point to zoom to
+      const pointTo = {
+        x: (newCenter.x - stage.x()) / oldScale,
+        y: (newCenter.y - stage.y()) / oldScale,
+      };
+
+      setStageInternalScale(newScale);
+      setGlobalStageScale(newScale);
+
+      const dx = newCenter.x - lastCenter.current.x;
+      const dy = newCenter.y - lastCenter.current.y;
+
+      const newPos = {
+        x: newCenter.x - pointTo.x * newScale + dx,
+        y: newCenter.y - pointTo.y * newScale + dy,
+      };
+
+      setStagePos(newPos);
+      lastDist.current = dist;
+      lastCenter.current = newCenter;
+    }
+  };
+
+  const handleTouchEnd = () => {
+    lastDist.current = 0;
+    lastCenter.current = null;
+  };
+
   const handleStageMouseDown = (e: Konva.KonvaEventObject<MouseEvent>) => {
     // Check if clicked on empty stage or a layer
     if (e.target !== e.target.getStage() && e.target.getType() !== 'Layer') return;
@@ -459,6 +536,8 @@ export const CanvasStage: React.FC<CanvasStageProps & { isStatic?: boolean }> = 
           width={stageSize.width}
           height={stageSize.height}
           onWheel={isStatic ? undefined : handleWheel}
+          onTouchMove={isStatic ? undefined : handleTouchMove}
+          onTouchEnd={isStatic ? undefined : handleTouchEnd}
           onMouseDown={isStatic ? undefined : handleStageMouseDown}
           onMouseUp={isStatic ? undefined : handleStageMouseUp}
           onMouseLeave={isStatic ? undefined : handleStageMouseLeave}
@@ -541,7 +620,8 @@ export const CanvasStage: React.FC<CanvasStageProps & { isStatic?: boolean }> = 
       )}
       {/* Subtle border decoration */}
       <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-primary/20 via-accent/30 to-primary/20 pointer-events-none"></div>
-      {/* Zoom controls */}
+      {/* Zoom controls - REMOVED for ALL UI based on user request */}
+      {/* 
       {editMode && !isStatic && (
         <div className="absolute top-3 left-3 flex flex-col gap-2 z-20">
           <TooltipProvider>
@@ -634,6 +714,7 @@ export const CanvasStage: React.FC<CanvasStageProps & { isStatic?: boolean }> = 
           </TooltipProvider>
         </div>
       )}
+      */}
 
       {/* Zoom indicator */}
       <div className="absolute bottom-3 right-3 bg-card/80 text-foreground/80 text-xs py-1 px-2 rounded shadow-sm z-20 border border-border/30">
