@@ -406,6 +406,27 @@ export const SeatingChartApp = () => {
     });
   };
 
+  const selectedShapes = baseShapesValue.filter(s => selectedShapeIds.includes(s.id));
+  const uniqueGroupIds = new Set(selectedShapes.map(s => s.groupId).filter(Boolean));
+  
+  const canGroup = selectedShapes.length > 1 && (uniqueGroupIds.size !== 1 || selectedShapes.some(s => !s.groupId));
+  const canUngroup = selectedShapes.length > 0 && uniqueGroupIds.size > 0;
+
+  const handleGroup = () => {
+    if (!canGroup) return;
+    const newGroupId = `group-${Date.now()}`;
+    setBaseShapes((prev) => 
+      prev.map(s => selectedShapeIds.includes(s.id) ? { ...s, groupId: newGroupId } : s)
+    );
+  };
+
+  const handleUngroup = () => {
+    if (!canUngroup) return;
+    setBaseShapes((prev) => 
+      prev.map(s => selectedShapeIds.includes(s.id) ? { ...s, groupId: undefined } : s)
+    );
+  };
+
   const handleToggleVenueLock = () => {
     if (editMode === false) {
       toast({
@@ -486,6 +507,10 @@ export const SeatingChartApp = () => {
           onDistributeVertical={handleDistributeVertical}
           isAnyLocked={isAnyLocked}
           onToggleLock={handleToggleLock}
+          canGroup={canGroup}
+          canUngroup={canUngroup}
+          onGroup={handleGroup}
+          onUngroup={handleUngroup}
         />
       )}
       <div className="flex flex-1 overflow-hidden">

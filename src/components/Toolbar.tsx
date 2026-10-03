@@ -1,5 +1,5 @@
 import React from 'react';
-import { Circle, Square, GripHorizontal, Component, BoxSelect, AlignCenterHorizontal, AlignCenterVertical, ArrowLeftRight, ArrowUpDown, Lock, Unlock } from 'lucide-react';
+import { Circle, Square, GripHorizontal, Component, BoxSelect, AlignCenterHorizontal, AlignCenterVertical, ArrowLeftRight, ArrowUpDown, Lock, Unlock, Group as GroupIcon, Ungroup } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { Table } from "@/types/seatingChart";
 
@@ -13,6 +13,10 @@ interface ToolbarProps {
   onDistributeVertical?: () => void;
   isAnyLocked?: boolean;
   onToggleLock?: () => void;
+  canGroup?: boolean;
+  canUngroup?: boolean;
+  onGroup?: () => void;
+  onUngroup?: () => void;
 }
 
 export const Toolbar: React.FC<ToolbarProps> = ({ 
@@ -24,7 +28,11 @@ export const Toolbar: React.FC<ToolbarProps> = ({
   onDistributeHorizontal,
   onDistributeVertical,
   isAnyLocked,
-  onToggleLock
+  onToggleLock,
+  canGroup,
+  canUngroup,
+  onGroup,
+  onUngroup
 }) => {
   if (!editMode) return null;
 
@@ -95,6 +103,19 @@ export const Toolbar: React.FC<ToolbarProps> = ({
       
       {selectedShapeCount > 0 && (
         <div className="flex items-center gap-2 p-4 pr-6 min-w-max border-l border-gray-200 ml-auto">
+          {canGroup && (
+            <button onClick={onGroup} className="p-2.5 rounded-lg border border-gray-200 bg-white hover:bg-gray-50 hover:border-gray-300 transition-colors tooltip-trigger flex items-center gap-2" title="Group Elements">
+              <GroupIcon className="w-4 h-4 text-gray-700" />
+              <span className="text-xs font-semibold text-gray-700">Group</span>
+            </button>
+          )}
+          {canUngroup && (
+            <button onClick={onUngroup} className="p-2.5 rounded-lg border border-gray-200 bg-white hover:bg-gray-50 hover:border-gray-300 transition-colors tooltip-trigger flex items-center gap-2" title="Ungroup Elements">
+              <Ungroup className="w-4 h-4 text-gray-700" />
+              <span className="text-xs font-semibold text-gray-700">Ungroup</span>
+            </button>
+          )}
+          <div className="w-px h-6 bg-gray-300 mx-1"></div>
           <button onClick={onToggleLock} className="p-2.5 rounded-lg border border-gray-200 bg-white hover:bg-gray-50 hover:border-gray-300 transition-colors tooltip-trigger" title={isAnyLocked ? "Unlock Elements" : "Lock Elements"}>
             {isAnyLocked ? <Unlock className="w-4 h-4 text-gray-700" /> : <Lock className="w-4 h-4 text-gray-700" />}
           </button>
