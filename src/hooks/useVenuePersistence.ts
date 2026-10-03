@@ -170,6 +170,7 @@ export const useVenuePersistence = () => {
           console.log("Persistence Hook: No slug and no last slug found, generating new one...");
         const newSlug = generateClientSlug();
         const newPin = generateVenuePin(); // Generate PIN
+        const newHostPin = generateVenuePin(); // Generate Host PIN
         const initialState: VenueData = {
           shapes: [],
           guests: [],
@@ -185,11 +186,15 @@ export const useVenuePersistence = () => {
         storage.setVenueData(newSlug, initialState);
         storage.setLastSlug(newSlug);
         storage.setPin(newSlug, newPin); // Store PIN
-        storage.setEditModeStorage(newSlug, true); // Creator is in edit mode
+        storage.setHostPin(newSlug, newHostPin); // Store Host PIN
+        storage.setEditModeStorage(newSlug, true);
+        storage.setHostModeStorage(newSlug, true); // Creator is in edit mode
         pinNeedsSync.current = newPin; // Mark PIN for backend sync
 
         setVenuePin(newPin); // Update Jotai atom for PIN display
-        setEditMode(true); // Update Jotai atom for edit mode
+        setHostPin(newHostPin);
+        setEditMode(true);
+        setHostMode(true); // Update Jotai atom for edit mode
 
         router.replace(`/${newSlug}`);
         isInitialLoadComplete.current = true;
@@ -311,6 +316,7 @@ export const useVenuePersistence = () => {
       // If in edit mode and a PIN exists, include it in the payload
       if (editMode && pinToPotentiallySave) {
         payload.pin = pinToPotentiallySave;
+        payload.hostPin = storage.getHostPin(slugToUpdate) || undefined;
           console.log(`Persistence Hook: Including current PIN in payload for slug ${slugToUpdate}`);
         // Clear the initial sync flag if this save includes the pin that needed syncing
         if (pinNeedsSync.current === pinToPotentiallySave) {
@@ -364,6 +370,7 @@ export const useVenuePersistence = () => {
   const handleResetVenue = useCallback(() => {
     const newSlug = generateClientSlug();
     const newPin = generateVenuePin(); // Generate new PIN
+    const newHostPin = generateVenuePin(); // Generate new Host PIN
     const initialState: VenueData = {
       shapes: [],
       guests: [],
@@ -379,11 +386,15 @@ export const useVenuePersistence = () => {
     storage.setVenueData(newSlug, initialState);
     storage.setLastSlug(newSlug);
     storage.setPin(newSlug, newPin); // Store new PIN
-    storage.setEditModeStorage(newSlug, true); // Set edit mode for new venue
+    storage.setHostPin(newSlug, newHostPin); // Store new Host PIN
+    storage.setEditModeStorage(newSlug, true);
+    storage.setHostModeStorage(newSlug, true); // Set edit mode for new venue
     pinNeedsSync.current = newPin; // Mark PIN for backend sync
 
     setVenuePin(newPin); // Update Jotai atom
-    setEditMode(true); // Update Jotai atom
+    setHostPin(newHostPin);
+    setEditMode(true);
+    setHostMode(true); // Update Jotai atom
 
     router.replace(`/${newSlug}`);
   }, [
@@ -400,7 +411,7 @@ export const useVenuePersistence = () => {
   const attemptUnlock = useCallback(
     async (
       pinAttempt: string,
-    ): Promise<{ success: boolean; message?: string }> => {
+    ): Promise<{ success: boolean; message?: string; role?: 'admin' | 'host' }> => {
       if (!slug) {
         console.error("Attempted to unlock without a slug.");
         return { success: false, message: "No venue loaded." };

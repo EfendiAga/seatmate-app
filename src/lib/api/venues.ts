@@ -102,12 +102,12 @@ export const updateVenue = async (
  * Validates a PIN for a given venue slug against the backend.
  * @param slug The unique identifier of the venue.
  * @param pin The 4-digit PIN to validate.
- * @returns A promise that resolves to an object with a success boolean and optional message.
+ * @returns A promise that resolves to an object with a success boolean and optional message, role, and hostPin.
  */
 export const validatePinOnServer = async (
   slug: string,
   pin: string,
-): Promise<{ success: boolean; message?: string }> => {
+): Promise<{ success: boolean; message?: string; role?: 'admin' | 'host'; hostPin?: string | null }> => {
   if (!slug) {
     throw new Error("Slug must be provided to validate a PIN.");
   }

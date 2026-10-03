@@ -94,7 +94,7 @@ interface HeaderProps {
   isMobileSidebarOpen: boolean;
   attemptUnlock: (
     pin: string,
-  ) => Promise<{ success: boolean; message?: string }>;
+  ) => Promise<{ success: boolean; message?: string; role?: 'admin' | 'host' }>;
   lockVenue: () => void;
 }
 
@@ -145,8 +145,8 @@ export const Header: React.FC<HeaderProps> = ({
       const result = await attemptUnlock(pinEntry);
       if (result.success) {
         toast({
-          title: "Editing Unlocked",
-          description: "You can now edit the canvas.",
+          title: result.role === 'host' ? "Host Mode Unlocked" : "Editing Unlocked",
+          description: result.role === 'host' ? "You can now manage guest arrivals." : "You can now edit the canvas.",
           variant: "default",
         });
         setPinEntry("");
@@ -427,6 +427,21 @@ export const Header: React.FC<HeaderProps> = ({
           {/* PIN Display / Input Area */}
           {editMode && venuePin ? (
             <div className="flex items-center space-x-2">
+              {hostPin && (
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <div className="flex items-center bg-muted/30 text-muted-foreground border border-muted rounded-md px-3 py-1.5 text-sm font-medium shadow-sm">
+                        <Users size={16} className="mr-1.5 text-primary/80" />
+                        <span>Host PIN: {hostPin}</span>
+                      </div>
+                    </TooltipTrigger>
+                    <TooltipContent className="bg-card text-card-foreground border-border">
+                      <p>This PIN allows hosts to manage guest arrivals without editing.</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              )}
               <TooltipProvider>
                 <Tooltip>
                   <TooltipTrigger asChild>
