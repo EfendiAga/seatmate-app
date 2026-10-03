@@ -625,9 +625,8 @@ export const CanvasStage: React.FC<CanvasStageProps & { isStatic?: boolean }> = 
       )}
       {/* Subtle border decoration */}
       <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-primary/20 via-accent/30 to-primary/20 pointer-events-none"></div>
-      {/* Zoom controls - REMOVED for ALL UI based on user request */}
-      {/* 
-      {editMode && !isStatic && (
+      {/* Zoom controls */}
+      {!isStatic && (
         <div className="absolute top-3 left-3 flex flex-col gap-2 z-20">
           <TooltipProvider>
             <Tooltip>
@@ -719,7 +718,6 @@ export const CanvasStage: React.FC<CanvasStageProps & { isStatic?: boolean }> = 
           </TooltipProvider>
         </div>
       )}
-      */}
 
       {/* Zoom indicator */}
       <div className="absolute bottom-3 right-3 bg-card/80 text-foreground/80 text-xs py-1 px-2 rounded shadow-sm z-20 border border-border/30">
