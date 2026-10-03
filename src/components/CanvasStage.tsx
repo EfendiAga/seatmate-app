@@ -27,6 +27,7 @@ import { RESET } from "jotai/utils"; // Import RESET
 import { ElementRect } from "./ElementRect"; // Import ElementRect
 import { TableCircle } from "./TableCircle"; // Import TableCircle
 import { Shape } from "../lib/atoms"; // Correct path
+import type { Table } from "../types/seatingChart";
 import { Button } from "@/components/ui/button";
 import { ZoomIn, ZoomOut, Maximize } from "lucide-react";
 import {
@@ -46,44 +47,44 @@ interface CanvasStageProps {
   // registerRef: (guestId: string | null, node: Konva.Group | null) => void;
 }
 
-// Type-safe atom renderer component
-const AtomRenderer: React.FC<{
+// Table renderer component - only renders table shapes
+const TableRenderer: React.FC<{
   shapeAtom: PrimitiveAtom<Shape>;
   highlightedGuestId: string | null;
-  registerRef: (guestId: string | null, node: Konva.Group | null) => void; // Add prop
+  registerRef: (guestId: string | null, node: Konva.Group | null) => void;
   registerShapeRef: (id: string, node: Konva.Node | null) => void;
   isStatic?: boolean;
 }> = ({ shapeAtom, highlightedGuestId, registerRef, registerShapeRef, isStatic }) => {
   const shape = useAtomValue(shapeAtom);
 
-  if (shape.type === "venue") {
-    return <ElementRect key={`venue-${shape.id}`} shapeAtom={shapeAtom} />;
+  if (shape.type !== "table") {
+    return null;
   }
 
-  if (shape.type === "table") {
-    return (
-      <TableCircle
-        key={`table-${shape.id}`}
-        shapeAtom={shapeAtom}
-        highlightedGuestId={highlightedGuestId}
-        registerRef={registerRef}
-        registerShapeRef={registerShapeRef}
-        isStatic={isStatic}
-      />
-    );
-  }
-
-  return null;
+  return (
+    <TableCircle
+      key={`table-${shape.id}`}
+      shapeAtom={shapeAtom as PrimitiveAtom<Table>}
+      highlightedGuestId={highlightedGuestId}
+      registerRef={registerRef}
+      registerShapeRef={registerShapeRef}
+      isStatic={isStatic}
+    />
+  );
 };
 
-// Venue filter component
+// Venue element filter component: only renders non-floor-plan venue elements (decor, stage, bar, etc.)
 const VenueElementRenderer: React.FC<{
   shapeAtom: PrimitiveAtom<Shape>;
   registerShapeRef: (id: string, node: Konva.Node | null) => void;
 }> = ({ shapeAtom, registerShapeRef }) => {
   const shape = useAtomValue(shapeAtom);
 
-  if (shape.type !== "venue" || shape.title === "Venue Space") {
+  if (
+    shape.type !== "venue" ||
+    shape.title === "Venue Space" ||
+    shape.id.startsWith("venuespace")
+  ) {
     return null;
   }
 
@@ -563,9 +564,8 @@ export const CanvasStage: React.FC<CanvasStageProps & { isStatic?: boolean }> = 
             pointerEvents: isStatic ? "none" : "auto",
           }}
         >
-          {/* First layer: Venue elements (background) */}
-          <Layer name="venue-layer">
-            {/* Render venue space shapes */}
+          {/* Layer 1: Floor plan space rectangle - ALWAYS first layer at the very bottom under every element */}
+          <Layer name="floor-plan-space-layer">
             {venueSpaceAtoms.map((shapeAtom) => (
               <ElementRect
                 key={`venue-space-${shapeAtom.toString()}`}
@@ -573,8 +573,10 @@ export const CanvasStage: React.FC<CanvasStageProps & { isStatic?: boolean }> = 
                 registerShapeRef={registerShapeRef}
               />
             ))}
+          </Layer>
 
-            {/* Render other venue elements using the specialized component */}
+          {/* Layer 2: Other venue elements (dance floors, stages, bars, etc.) on top of floor plan */}
+          <Layer name="venue-elements-layer">
             {shapeAtoms.map((shapeAtom) => (
               <VenueElementRenderer
                 key={`venue-filter-${shapeAtom.toString()}`}
@@ -584,15 +586,14 @@ export const CanvasStage: React.FC<CanvasStageProps & { isStatic?: boolean }> = 
             ))}
           </Layer>
 
-          {/* Second layer: Tables and chairs (always on top) */}
+          {/* Layer 3: Tables and chairs (always on top of venue elements) */}
           <Layer name="tables-layer">
             {shapeAtoms.map((shapeAtom) => (
               <React.Fragment key={`table-check-${shapeAtom.toString()}`}>
-                {/* This will only render TableCircle if the atom is a table type */}
-                <AtomRenderer
+                <TableRenderer
                   shapeAtom={shapeAtom}
                   highlightedGuestId={hoveredGuestId || searchedGuestId}
-                  registerRef={registerChairRef} // Pass down register function
+                  registerRef={registerChairRef}
                   registerShapeRef={registerShapeRef}
                   isStatic={isStatic}
                 />

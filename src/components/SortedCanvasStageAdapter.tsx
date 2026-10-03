@@ -26,20 +26,26 @@ export const SortedCanvasStageAdapter: React.FC<
       value: shapeValues[index] as Shape, // Relies on order preservation from map
     }));
 
-    // Sort: 'venue' types first, then 'table' types.
-    // This order ensures venue elements are rendered first (bottom),
-    // and tables are rendered later (on top).
+    // Sort: Floor Plan Space ALWAYS first (bottom-most layer under everything),
+    // then other venue elements, then tables on top.
     atomsWithValues.sort((itemA, itemB) => {
-      const typeA = itemA.value.type;
-      const typeB = itemB.value.type;
+      const isFloorPlanSpaceA =
+        itemA.value.type === "venue" &&
+        (itemA.value.id.startsWith("venuespace") || itemA.value.title === "Venue Space");
+      const isFloorPlanSpaceB =
+        itemB.value.type === "venue" &&
+        (itemB.value.id.startsWith("venuespace") || itemB.value.title === "Venue Space");
+
+      if (isFloorPlanSpaceA && !isFloorPlanSpaceB) return -1;
+      if (!isFloorPlanSpaceA && isFloorPlanSpaceB) return 1;
 
       const orderPriority: Record<Shape["type"], number> = {
         venue: 1, // Rendered first
         table: 2, // Rendered second (on top of venue)
       };
 
-      const priorityA = orderPriority[typeA] || 99; // Fallback for unknown types
-      const priorityB = orderPriority[typeB] || 99;
+      const priorityA = orderPriority[itemA.value.type] || 99;
+      const priorityB = orderPriority[itemB.value.type] || 99;
 
       return priorityA - priorityB;
     });

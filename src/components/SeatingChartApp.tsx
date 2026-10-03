@@ -122,7 +122,7 @@ export const SeatingChartApp = () => {
   const venueSpaceExists = useMemo(
     () =>
       baseShapesValue.some(
-        (shape) => shape.type === "venue" && shape.title === "Venue Space",
+        (shape) => shape.type === "venue" && (shape.id.startsWith("venuespace") || shape.title === "Venue Space"),
       ),
     [baseShapesValue],
   );
@@ -497,7 +497,7 @@ export const SeatingChartApp = () => {
     setIsVenueLocked(nextLockedState);
 
     const venueSpaceElement = baseShapesValue.find(
-      (shape) => shape.type === "venue" && shape.title === "Venue Space",
+      (shape) => shape.type === "venue" && (shape.id.startsWith("venuespace") || shape.title === "Venue Space"),
     );
     const venueSpaceId = venueSpaceElement?.id;
 

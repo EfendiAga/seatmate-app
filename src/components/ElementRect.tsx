@@ -56,7 +56,7 @@ const ElementRectContent: React.FC<{
   const shapeRef = useRef<Konva.Group>(null);
   const isSelected = selectedShapeIds.includes(shape.id);
   const baseShapes = useAtomValue(baseShapesAtom);
-  const isVenueSpace = shape.title === "Venue Space";
+  const isVenueSpace = shape.title === "Venue Space" || shape.id.startsWith("venuespace");
   const { theme } = useTheme();
 
   // Choose colors based on theme

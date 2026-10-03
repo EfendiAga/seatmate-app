@@ -105,7 +105,7 @@ export const venueDataAtom = atom<VenueData>(
 export const venueSpaceShapeAtomsAtom = atom((get) =>
   get(shapeAtomsAtom).filter((shapeAtom) => {
     const shape = get(shapeAtom);
-    return shape.type === "venue" && shape.title === "Venue Space";
+    return shape.type === "venue" && (shape.id.startsWith("venuespace") || shape.title === "Venue Space");
   }),
 );
 
@@ -113,10 +113,10 @@ export const venueSpaceShapeAtomsAtom = atom((get) =>
 export const otherShapeAtomsAtom = atom((get) =>
   get(shapeAtomsAtom).filter((shapeAtom) => {
     const shape = get(shapeAtom);
-    // Include tables and venue elements that are NOT title 'Venue Space'
+    // Include tables and venue elements that are NOT Venue Space
     return (
       shape.type === "table" ||
-      (shape.type === "venue" && shape.title !== "Venue Space")
+      (shape.type === "venue" && !shape.id.startsWith("venuespace") && shape.title !== "Venue Space")
     );
   }),
 );
