@@ -13,9 +13,12 @@ export function GuestListSheet() {
 
   const tables = shapes.filter(s => s.type === "table") as TableShape[];
 
-  const filteredGuests = guests.filter(g => 
-    (g.firstName + " " + g.lastName).toLowerCase().includes(search.toLowerCase())
-  );
+  const filteredGuests = guests.filter(g => {
+    const table = tables.find(t => t.id === g.tableId);
+    const tableName = table ? (table.name || `Table ${table.number}`) : 'Unassigned';
+    const combined = `${g.firstName} ${g.lastName} ${tableName} ${g.dietaryNotes || ''}`.toLowerCase();
+    return combined.includes(search.toLowerCase());
+  });
 
   return (
     <Sheet>

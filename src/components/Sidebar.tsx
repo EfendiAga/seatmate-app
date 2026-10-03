@@ -14,7 +14,8 @@ import {
   guestsAtom,
   editModeAtom,
   updateBaseShapesAtom,
-  selectedShapeIdsAtom
+  selectedShapeIdsAtom,
+  renameModalStateAtom
 } from "@/lib/atoms";
 import { Guest, Table } from "../types/seatingChart";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -62,11 +63,24 @@ export const Sidebar: React.FC<SidebarProps> = ({
   const setGlobalGuests = useSetAtom(guestsAtom);
   const editMode = useAtomValue(editModeAtom);
   const setBaseShapes = useSetAtom(updateBaseShapesAtom);
+  const setRenameModalState = useSetAtom(renameModalStateAtom);
   const [selectedShapeIds, setSelectedShapeIds] = useAtom(selectedShapeIdsAtom);
   const [newGuestNames, setNewGuestNames] = useState<Record<string, string>>(
     {},
   );
   const { toast } = useToast();
+
+  const handleTableRename = useCallback((tableId: string, currentTitle: string) => {
+    if (!editMode) {
+      toast({ title: "View-Only Mode", description: "Cannot rename tables while in view-only mode.", variant: "destructive" });
+      return;
+    }
+    setRenameModalState({
+      isOpen: true,
+      elementId: tableId,
+      currentTitle: currentTitle,
+    });
+  }, [editMode, setRenameModalState, toast]);
 
   const handleTableDelete = useCallback((tableIdToDelete: string) => {
     if (!editMode) {
@@ -137,7 +151,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   const groupedGuests = useMemo(() => {
     const groups: Record<
       string,
-      { tableNumber: number | null; tableCapacity?: number; guests: Guest[] }
+      { tableNumber: number | null; tableName?: string; tableCapacity?: number; guests: Guest[] }
     > = {
       unassigned: { tableNumber: null, guests: [] },
     };
@@ -146,6 +160,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
     tables.forEach((table) => {
       groups[table.id] = {
         tableNumber: table.number,
+        tableName: table.name,
         tableCapacity: table.capacity,
         guests: [],
       };
@@ -156,9 +171,11 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
       if (guestTableId !== "unassigned" && tableMap.has(guestTableId)) {
         if (!groups[guestTableId]) {
+          const t = tableMap.get(guestTableId);
           groups[guestTableId] = {
-            tableNumber: tableMap.get(guestTableId)?.number ?? null,
-            tableCapacity: tableMap.get(guestTableId)?.capacity,
+            tableNumber: t?.number ?? null,
+            tableName: t?.name,
+            tableCapacity: t?.capacity,
             guests: [],
           };
         }
@@ -190,7 +207,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
     const sortedGroups: Record<
       string,
-      { tableNumber: number | null; tableCapacity?: number; guests: Guest[] }
+      { tableNumber: number | null; tableName?: string; tableCapacity?: number; guests: Guest[] }
     > = {};
     sortedGroupKeys.forEach((key) => {
       sortedGroups[key] = groups[key];
@@ -307,7 +324,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
           );
           toast({
             title: "Table Full",
-            description: `Table ${targetTable.number} has no available seats.`,
+            description: `${targetTable.name || `Table ${targetTable.number}`} has no available seats.`,
             variant: "destructive",
             duration: 2000,
           });
@@ -455,6 +472,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                         : undefined
                     }
                     onTableDelete={!isUnassigned ? handleTableDelete : undefined}
+                    onTableRename={!isUnassigned ? handleTableRename : undefined}
                   />
                 );
               })}

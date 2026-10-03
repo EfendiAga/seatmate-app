@@ -3,13 +3,15 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Search, MapPin } from "lucide-react";
 import { useAtom, useAtomValue } from "jotai";
-import { guestsAtom, searchedGuestIdAtom } from "@/lib/atoms";
+import { guestsAtom, searchedGuestIdAtom, baseShapesAtom } from "@/lib/atoms";
+import { Table } from "@/types/seatingChart";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
 
 export const GuestSearch = () => {
   const guests = useAtomValue(guestsAtom);
+  const shapes = useAtomValue(baseShapesAtom);
   const { toast } = useToast();
   const [searchedGuestId, setSearchedGuestId] = useAtom(searchedGuestIdAtom);
   const [searchTerm, setSearchTerm] = useState("");
@@ -91,20 +93,27 @@ export const GuestSearch = () => {
         <div className="absolute top-full mt-1 w-full bg-card border border-border/50 rounded-md shadow-lg max-h-60 overflow-y-auto">
           {filteredGuests.length > 0 ? (
             <ul className="py-1">
-              {filteredGuests.map((guest) => (
-                <li
-                  key={guest.id}
-                  className="px-3 py-2 text-sm hover:bg-accent hover:text-accent-foreground cursor-pointer flex items-center justify-between"
-                  onClick={() => handleSelect(guest.id, `${guest.firstName} ${guest.lastName || ""}`.trim(), !!guest.tableId)}
-                >
-                  <span>{guest.firstName} {guest.lastName}</span>
-                  {guest.tableId ? (
-                    <MapPin className="h-3 w-3 text-primary" />
-                  ) : (
-                    <span className="text-xs text-muted-foreground italic">Unseated</span>
-                  )}
-                </li>
-              ))}
+              {filteredGuests.map((guest) => {
+                const assignedTable = shapes.find((s) => s.id === guest.tableId) as Table | undefined;
+                const tableName = assignedTable ? (assignedTable.name || `Table ${assignedTable.number}`) : null;
+                return (
+                  <li
+                    key={guest.id}
+                    className="px-3 py-2 text-sm hover:bg-accent hover:text-accent-foreground cursor-pointer flex items-center justify-between"
+                    onClick={() => handleSelect(guest.id, `${guest.firstName} ${guest.lastName || ""}`.trim(), !!guest.tableId)}
+                  >
+                    <span className="font-medium">{guest.firstName} {guest.lastName}</span>
+                    {tableName ? (
+                      <span className="flex items-center gap-1 text-xs text-primary font-medium bg-primary/10 px-2 py-0.5 rounded-full">
+                        <MapPin className="h-3 w-3" />
+                        {tableName}
+                      </span>
+                    ) : (
+                      <span className="text-xs text-muted-foreground italic">Unseated</span>
+                    )}
+                  </li>
+                );
+              })}
             </ul>
           ) : (
             <div className="px-3 py-2 text-sm text-muted-foreground text-center">

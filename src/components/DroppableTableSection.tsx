@@ -6,12 +6,13 @@ import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { DraggableGuestListItem } from "./DraggableGuestListItem";
-import { Users, Coffee, PlusCircle, Trash2 } from "lucide-react";
+import { Users, Coffee, PlusCircle, Trash2, Pencil } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 interface GroupData {
   // Define locally or import if exported from Sidebar
   tableNumber: number | null;
+  tableName?: string;
   tableCapacity?: number;
   guests: Guest[];
 }
@@ -36,6 +37,7 @@ interface DroppableTableSectionProps {
   isInputVisible?: boolean;
   onToggleInput?: () => void;
   onTableDelete?: (tableId: string) => void;
+  onTableRename?: (tableId: string, currentTitle: string) => void;
 }
 
 export const DroppableTableSection: React.FC<DroppableTableSectionProps> = ({
@@ -55,6 +57,7 @@ export const DroppableTableSection: React.FC<DroppableTableSectionProps> = ({
   isInputVisible,
   onToggleInput,
   onTableDelete,
+  onTableRename,
 }) => {
   const { setNodeRef, isOver } = useDroppable({ id: tableId });
   const totalSeats = groupData.tableCapacity || 0;
@@ -79,17 +82,23 @@ export const DroppableTableSection: React.FC<DroppableTableSectionProps> = ({
     >
       {/* Header */}
       <div className="flex items-center justify-between mb-2.5">
-        <h3 className="font-medium text-sidebar-primary flex items-center">
+        <h3 className="font-medium text-sidebar-primary flex items-center min-w-0 mr-2">
           {groupData.tableNumber !== null ? (
             <>
-              <span className="inline-flex items-center justify-center bg-sidebar-primary/10 text-sidebar-primary w-7 h-7 rounded-full mr-2 text-sm shadow-sm">
+              <span className="inline-flex items-center justify-center bg-sidebar-primary/10 text-sidebar-primary w-7 h-7 rounded-full mr-2 text-sm shadow-sm flex-shrink-0 font-semibold">
                 {groupData.tableNumber}
               </span>
-              <span>Table {groupData.tableNumber}</span>
+              <span 
+                className="truncate cursor-pointer hover:underline hover:text-primary transition-colors"
+                title={onTableRename ? `Click to rename (${groupData.tableName || `Table ${groupData.tableNumber}`})` : (groupData.tableName || `Table ${groupData.tableNumber}`)}
+                onClick={() => onTableRename?.(tableId, groupData.tableName || `Table ${groupData.tableNumber}`)}
+              >
+                {groupData.tableName || `Table ${groupData.tableNumber}`}
+              </span>
             </>
           ) : (
             <span className="text-sidebar-foreground/80 flex items-center">
-              <Coffee size={16} className="mr-1.5" strokeWidth={1.5} />
+              <Coffee size={16} className="mr-1.5 flex-shrink-0" strokeWidth={1.5} />
               Unassigned Guests
             </span>
           )}
@@ -102,7 +111,7 @@ export const DroppableTableSection: React.FC<DroppableTableSectionProps> = ({
             {occupiedSeats}
           </Badge>
         ) : (
-          <div className="flex items-center gap-1.5">
+          <div className="flex items-center gap-1.5 flex-shrink-0">
             <Badge
               variant="outline"
               className="text-xs bg-sidebar-accent/10 text-sidebar-foreground/80 shadow-sm border-sidebar-border/40 px-2"
@@ -110,6 +119,20 @@ export const DroppableTableSection: React.FC<DroppableTableSectionProps> = ({
               <Users size={12} className="mr-1.5" strokeWidth={1.5} />
               {occupiedSeats}/{totalSeats}
             </Badge>
+            {onTableRename && (
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-6 w-6 text-sidebar-foreground/50 hover:text-primary hover:bg-primary/10"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onTableRename(tableId, groupData.tableName || `Table ${groupData.tableNumber}`);
+                }}
+                title="Rename Table"
+              >
+                <Pencil size={12} />
+              </Button>
+            )}
             {onTableDelete && (
               <Button
                 variant="ghost"
@@ -121,7 +144,7 @@ export const DroppableTableSection: React.FC<DroppableTableSectionProps> = ({
                 }}
                 title="Delete Table"
               >
-                <Trash2 size={14} />
+                <Trash2 size={13} />
               </Button>
             )}
           </div>

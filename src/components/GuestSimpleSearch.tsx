@@ -100,7 +100,14 @@ export function GuestSimpleSearch() {
                         <div className={`h-10 w-10 rounded-full flex items-center justify-center transition-transform ${isArrived && hostMode ? 'bg-green-500/20 text-green-600' : 'bg-primary/10 text-primary'} group-hover:scale-110`}>
                           {isArrived && hostMode ? <CheckCircle2 size={20} /> : <User size={20} />}
                         </div>
-                        <span className={`font-medium text-lg ${isArrived && hostMode ? 'text-green-700' : ''}`}>{`${guest.firstName} ${guest.lastName}`.trim() || "Unnamed Guest"}</span>
+                        <div className="flex items-center flex-wrap gap-2">
+                          <span className={`font-medium text-lg ${isArrived && hostMode ? 'text-green-700' : ''}`}>{`${guest.firstName} ${guest.lastName}`.trim() || "Unnamed Guest"}</span>
+                          {guest.tableId && (
+                            <span className="text-xs font-normal text-muted-foreground px-2 py-0.5 bg-muted/80 rounded-full border border-border/40">
+                              {tables.find(t => t.id === guest.tableId)?.name || `Table ${tables.find(t => t.id === guest.tableId)?.number}`}
+                            </span>
+                          )}
+                        </div>
                       </div>
                       <div className="flex items-center gap-3">
                         {hostMode && (
@@ -140,7 +147,7 @@ export function GuestSimpleSearch() {
                   </h2>
                   <div className="text-sm text-muted-foreground mt-0.5">
                     {assignedTable ? (
-                      <span>You are seated at <strong className="text-primary font-bold text-base bg-primary/10 px-2 py-0.5 rounded ml-1">Table {assignedTable.number}</strong></span>
+                      <span>You are seated at <strong className="text-primary font-bold text-base bg-primary/10 px-2 py-0.5 rounded ml-1">{assignedTable.name || `Table ${assignedTable.number}`}</strong></span>
                     ) : (
                       "Please see the host for your seating arrangement."
                     )}

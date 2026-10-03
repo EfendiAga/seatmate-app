@@ -1,8 +1,8 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import { useAtom, useSetAtom, useAtomValue } from "jotai";
-import { modalStateAtom, guestsAtom } from "@/lib/atoms";
-import { Guest } from "../types/seatingChart";
+import { modalStateAtom, guestsAtom, baseShapesAtom } from "@/lib/atoms";
+import { Guest, Table } from "../types/seatingChart";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -19,9 +19,17 @@ import { Trash2 } from "lucide-react";
 export const GuestAssignmentModal = () => {
   const [modalState, setModalState] = useAtom(modalStateAtom);
   const [guests, setGuests] = useAtom(guestsAtom);
+  const shapes = useAtomValue(baseShapesAtom);
 
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
+
+  const currentTableName = React.useMemo(() => {
+    if (!modalState.chairId) return null;
+    const [tableId] = modalState.chairId.split("---");
+    const table = shapes.find((s) => s.id === tableId) as Table | undefined;
+    return table ? (table.name || `Table ${table.number}`) : null;
+  }, [modalState.chairId, shapes]);
 
   // Effect to load guest data when modal opens with an existing guestId
   useEffect(() => {
@@ -159,7 +167,9 @@ export const GuestAssignmentModal = () => {
               {modalState.guestId ? "Edit Guest" : "Assign Guest"}
             </DialogTitle>
             <DialogDescription className="text-muted-foreground">
-              Enter the guest's name for this seat.
+              {currentTableName
+                ? `Enter the guest's name for this seat at ${currentTableName}.`
+                : "Enter the guest's name for this seat."}
             </DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 py-4">

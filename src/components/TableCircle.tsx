@@ -11,7 +11,8 @@ import {
   hoveredTableIdAtom,
   venueSpaceLockedAtom,
   editModeAtom,
-  baseShapesAtom
+  baseShapesAtom,
+  renameModalStateAtom,
 } from "@/lib/atoms";
 import { PrimitiveAtom } from "jotai";
 import type { Table } from "../types/seatingChart";
@@ -101,8 +102,21 @@ const TableCircleContent: React.FC<{
   const trRef = useRef<Konva.Transformer>(null);
   const isSelected = selectedShapeIds.includes(shape.id);
   const baseShapes = useAtomValue(baseShapesAtom);
+  const setRenameModalState = useSetAtom(renameModalStateAtom);
   const { theme } = useTheme();
   const { toast } = useToast();
+
+  const handleRename = (e?: Konva.KonvaEventObject<MouseEvent | TouchEvent>) => {
+    if (e) {
+      e.cancelBubble = true;
+    }
+    if (!editMode) return;
+    setRenameModalState({
+      isOpen: true,
+      elementId: shape.id,
+      currentTitle: shape.name || `Table ${shape.number}`,
+    });
+  };
 
   // State for button hover effects (these are for the buttons themselves, not the table)
   const [isMinusHovered, setIsMinusHovered] = useState(false);
@@ -400,15 +414,8 @@ const TableCircleContent: React.FC<{
         onTap={handleSelect}
         onDragStart={handleDragStart}
         onDragEnd={handleDragEnd}
-          onDblClick={() => {
-            if (editMode) {
-              const newName = window.prompt("Enter new table name:", shape.name || `Table ${shape.number}`);
-              if (newName !== null) {
-                saveHistory();
-                setShape({ ...shape, name: newName });
-              }
-            }
-          }}
+        onDblClick={handleRename}
+        onDblTap={handleRename}
         onTransformEnd={handleTransformEnd}
         offsetX={0}
         offsetY={0}
@@ -488,19 +495,40 @@ const TableCircleContent: React.FC<{
             />
           )}
 
-                  {/* Centered Table Number */}
+                  {/* Centered Table Name / Number */}
           <Text
-            text={`Table ${shape.number}`}
-            fontSize={Math.max(12 * scaleFactor, 18 * scaleFactor)}
+            text={shape.name?.trim() ? shape.name.trim() : `Table ${shape.number}`}
+            fontSize={
+              (shape.name?.trim() ? shape.name.trim() : `Table ${shape.number}`).length > 18
+                ? Math.max(9 * scaleFactor, 12 * scaleFactor)
+                : (shape.name?.trim() ? shape.name.trim() : `Table ${shape.number}`).length > 12
+                ? Math.max(10 * scaleFactor, 14 * scaleFactor)
+                : Math.max(12 * scaleFactor, 17 * scaleFactor)
+            }
             fontFamily="'Inter', sans-serif"
             fill={COLORS.tableTextPrimary}
             fontStyle="bold"
             align="center"
             verticalAlign="middle"
+            wrap="wrap"
+            padding={4}
+            ellipsis={true}
             x={shape.tableShape === 'rectangular' ? -(shape.width || 120)/2 : -(shape.radius || MIN_TABLE_RADIUS)}
-            y={-15 * scaleFactor}
+            y={-17 * scaleFactor}
             width={shape.tableShape === 'rectangular' ? (shape.width || 120) : (shape.radius || MIN_TABLE_RADIUS)*2}
-            listening={false}
+            listening={true}
+            onClick={(e) => {
+              if (isSelected && editMode) {
+                handleRename(e);
+              }
+            }}
+            onTap={(e) => {
+              if (isSelected && editMode) {
+                handleRename(e);
+              }
+            }}
+            onDblClick={handleRename}
+            onDblTap={handleRename}
           />
           {/* Centered Capacity Text */}
           <Text
