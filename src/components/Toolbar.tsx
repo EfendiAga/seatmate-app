@@ -1,5 +1,5 @@
 import React from 'react';
-import { Circle, Square, GripHorizontal, Component, BoxSelect, AlignCenterHorizontal, AlignCenterVertical, ArrowLeftRight, ArrowUpDown } from 'lucide-react';
+import { Circle, Square, GripHorizontal, Component, BoxSelect, AlignCenterHorizontal, AlignCenterVertical, ArrowLeftRight, ArrowUpDown, Lock, Unlock } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { Table } from "@/types/seatingChart";
 
@@ -11,6 +11,8 @@ interface ToolbarProps {
   onAlignVertical?: () => void;
   onDistributeHorizontal?: () => void;
   onDistributeVertical?: () => void;
+  isAnyLocked?: boolean;
+  onToggleLock?: () => void;
 }
 
 export const Toolbar: React.FC<ToolbarProps> = ({ 
@@ -20,7 +22,9 @@ export const Toolbar: React.FC<ToolbarProps> = ({
   onAlignHorizontal,
   onAlignVertical,
   onDistributeHorizontal,
-  onDistributeVertical
+  onDistributeVertical,
+  isAnyLocked,
+  onToggleLock
 }) => {
   if (!editMode) return null;
 
@@ -89,6 +93,14 @@ export const Toolbar: React.FC<ToolbarProps> = ({
         ))}
       </div>
       
+      {selectedShapeCount > 0 && (
+        <div className="flex items-center gap-2 p-4 pr-6 min-w-max border-l border-gray-200 ml-auto">
+          <button onClick={onToggleLock} className="p-2.5 rounded-lg border border-gray-200 bg-white hover:bg-gray-50 hover:border-gray-300 transition-colors tooltip-trigger" title={isAnyLocked ? "Unlock Elements" : "Lock Elements"}>
+            {isAnyLocked ? <Unlock className="w-4 h-4 text-gray-700" /> : <Lock className="w-4 h-4 text-gray-700" />}
+          </button>
+        </div>
+      )}
+
       {selectedShapeCount > 1 && (
         <div className="flex items-center gap-2 p-4 pr-6 min-w-max border-l border-gray-200 ml-4">
           <span className="text-xs font-semibold text-gray-500 uppercase mr-2 tracking-wider">Align</span>

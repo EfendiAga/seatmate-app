@@ -24,6 +24,7 @@ export interface Table {
   capacity: number;
   draggable?: boolean;
   groupId?: string;
+  isLocked?: boolean;
 }
 
 export interface VenueElement {
@@ -39,4 +40,5 @@ export interface VenueElement {
   strokeWidth?: number;
   draggable?: boolean;
   groupId?: string;
+  isLocked?: boolean;
 }

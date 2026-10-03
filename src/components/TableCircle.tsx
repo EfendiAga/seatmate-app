@@ -114,8 +114,8 @@ const TableCircleContent: React.FC<{
   // Choose colors based on theme
   const COLORS = LIGHT_COLORS;
 
-  // Draggability depends on shape prop, not panning, AND edit mode
-  const isDraggable = shape.draggable !== false && !isPanning && editMode;
+  // Draggability depends on shape prop, not panning, AND edit mode, and not locked
+  const isDraggable = shape.draggable !== false && !isPanning && editMode && !shape.isLocked;
 
   useEffect(() => {
     if (registerShapeRef) {
@@ -302,7 +302,7 @@ const TableCircleContent: React.FC<{
 
   const handleTransformEnd = (e: Konva.KonvaEventObject<Event>) => {
     // Transformation implies editing
-    if (!editMode) return; 
+    if (!editMode || shape.isLocked) return; 
     const node = shapeRef.current;
     if (!node) return;
     const scaleX = node.scaleX();

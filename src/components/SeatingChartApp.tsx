@@ -377,6 +377,35 @@ export const SeatingChartApp = () => {
     });
   };
 
+  const isAnyLocked = selectedShapeIds.length > 0 && baseShapesValue.some(
+    (shape) => selectedShapeIds.includes(shape.id) && shape.isLocked
+  );
+
+  const handleToggleLock = () => {
+    if (!editMode || selectedShapeIds.length === 0) return;
+    
+    // Check if any shape in the selection (or their groups) is locked
+    const nextLockedState = !isAnyLocked;
+    
+    // We should lock/unlock all selected shapes, and if they belong to a group, the whole group
+    setBaseShapes((prev) => {
+      const selectedShapes = prev.filter(s => selectedShapeIds.includes(s.id));
+      const groupIds = new Set(selectedShapes.map(s => s.groupId).filter(Boolean));
+      
+      return prev.map(s => {
+        if (selectedShapeIds.includes(s.id) || (s.groupId && groupIds.has(s.groupId))) {
+          return { ...s, isLocked: nextLockedState };
+        }
+        return s;
+      });
+    });
+    
+    toast({
+      title: nextLockedState ? "Elements Locked" : "Elements Unlocked",
+      description: nextLockedState ? "Selected elements cannot be moved or resized." : "Selected elements can now be edited.",
+    });
+  };
+
   const handleToggleVenueLock = () => {
     if (editMode === false) {
       toast({
@@ -455,6 +484,8 @@ export const SeatingChartApp = () => {
           onAlignVertical={handleAlignVertical}
           onDistributeHorizontal={handleDistributeHorizontal}
           onDistributeVertical={handleDistributeVertical}
+          isAnyLocked={isAnyLocked}
+          onToggleLock={handleToggleLock}
         />
       )}
       <div className="flex flex-1 overflow-hidden">

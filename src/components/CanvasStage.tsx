@@ -518,13 +518,13 @@ export const CanvasStage: React.FC<CanvasStageProps & { isStatic?: boolean }> = 
             {selectedShapeIds.length > 0 && editMode && (
               <Transformer
                 ref={trRef}
-                rotateEnabled={false}
-                resizeEnabled={true}
+                rotateEnabled={!baseShapes.some(s => selectedShapeIds.includes(s.id) && s.isLocked)}
+                resizeEnabled={!baseShapes.some(s => selectedShapeIds.includes(s.id) && s.isLocked)}
                 borderStroke="#3b82f6"
                 anchorFill="#ffffff"
                 anchorStroke="#3b82f6"
                 anchorCornerRadius={5}
-                keepRatio={false}
+                keepRatio={selectedShapeIds.length > 1 || baseShapes.some(s => selectedShapeIds.includes(s.id) && s.groupId)}
                 padding={5}
               />
             )}

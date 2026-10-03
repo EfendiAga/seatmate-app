@@ -71,7 +71,7 @@ const ElementRectContent: React.FC<{
   }, [theme]); // Re-run when theme changes
 
   // Draggability depends on type, panning state, global lock state, and edit mode
-  const isDraggable = editMode && (
+  const isDraggable = editMode && !shape.isLocked && (
     isVenueSpace
       ? !isVenueLocked && !isPanning // Venue space only draggable if unlocked AND not panning
       : !isPanning // Other elements only non-draggable if panning
@@ -133,7 +133,7 @@ const ElementRectContent: React.FC<{
 
   const handleTransformEnd = (e: Konva.KonvaEventObject<Event>) => {
     // Transformation implies editing, should only happen if enabled
-    if (!editMode) return; 
+    if (!editMode || shape.isLocked) return; 
     const node = shapeRef.current;
     if (!node) return;
     const scaleX = node.scaleX();
