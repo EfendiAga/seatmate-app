@@ -471,16 +471,20 @@ export const CanvasStage: React.FC<CanvasStageProps & { isStatic?: boolean }> = 
       stage.scale({ x: newScale, y: newScale });
       stage.position(newPos);
       stage.batchDraw();
-
-      // Sync with React state
-      setStageInternalScale(newScale);
-      setGlobalStageScale(newScale);
-      setStagePos(newPos);
     }
   };
 
   const handleTouchEnd = () => {
     touchState.current = null;
+    
+    // Sync with React state only on end to prevent re-renders during gesture
+    const stage = stageRef.current;
+    if (stage) {
+      const scale = stage.scaleX();
+      setStageInternalScale(scale);
+      setGlobalStageScale(scale);
+      setStagePos(stage.position());
+    }
   };
 
   const handleStageMouseDown = (e: Konva.KonvaEventObject<MouseEvent>) => {
