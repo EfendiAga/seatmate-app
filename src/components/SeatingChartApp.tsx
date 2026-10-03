@@ -33,18 +33,50 @@ import {
   SheetTitle,
 } from "@/components/ui/sheet";
 
-// Placeholder for useMediaQuery hook
+// Robust useMediaQuery hook supporting all browsers (Firefox, Chrome, Safari) and dynamic resizing
 const useMediaQuery = (query: string) => {
-  const [matches, setMatches] = useState(false);
-  useEffect(() => {
-    const media = window.matchMedia(query);
-    if (media.matches !== matches) {
-      setMatches(media.matches);
+  const [matches, setMatches] = useState<boolean>(() => {
+    if (typeof window !== "undefined") {
+      return window.matchMedia(query).matches;
     }
-    const listener = () => setMatches(media.matches);
-    window.addEventListener("resize", listener);
-    return () => window.removeEventListener("resize", listener);
-  }, [matches, query]);
+    return true;
+  });
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const media = window.matchMedia(query);
+    
+    // Sync immediately
+    setMatches(media.matches);
+
+    const mediaListener = (e: MediaQueryListEvent) => {
+      setMatches(e.matches);
+    };
+
+    const resizeListener = () => {
+      setMatches(window.matchMedia(query).matches);
+    };
+
+    if (media.addEventListener) {
+      media.addEventListener("change", mediaListener);
+    } else {
+      // @ts-ignore
+      media.addListener(mediaListener);
+    }
+
+    window.addEventListener("resize", resizeListener);
+
+    return () => {
+      if (media.removeEventListener) {
+        media.removeEventListener("change", mediaListener);
+      } else {
+        // @ts-ignore
+        media.removeListener(mediaListener);
+      }
+      window.removeEventListener("resize", resizeListener);
+    };
+  }, [query]);
+
   return matches;
 };
 
@@ -539,18 +571,21 @@ export const SeatingChartApp = () => {
         />
       )}
       <div className="flex flex-1 overflow-hidden">
-        {editMode && isDesktop ? (
-          <Sidebar
-            guests={guestsValue}
-            tables={baseShapesValue.filter(
-              (s): s is Table => s.type === "table",
-            )}
-          />
-        ) : editMode && !isDesktop ? (
+        {editMode && (
+          <aside className="hidden lg:flex flex-shrink-0 h-full w-80 z-10">
+            <Sidebar
+              guests={guestsValue}
+              tables={baseShapesValue.filter(
+                (s): s is Table => s.type === "table",
+              )}
+            />
+          </aside>
+        )}
+        {editMode && (
           <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
             <SheetContent
               side="left"
-              className="w-72 sm:w-80 p-0 overflow-y-auto"
+              className="w-80 sm:w-88 p-0 overflow-y-auto"
             >
               <SheetHeader className="p-5 pb-2 sr-only">
                 <SheetTitle>Guest List and Tables</SheetTitle>
@@ -564,7 +599,7 @@ export const SeatingChartApp = () => {
               />
             </SheetContent>
           </Sheet>
-        ) : null}
+        )}
         <div className="flex-1 flex flex-col p-4 md:p-5 border-l border-border/40 bg-background/50">
           <div
             className={`flex-1 relative rounded-lg ${editMode ? 'glass shadow-premium rounded-2xl' : ''} overflow-hidden`}

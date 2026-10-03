@@ -191,19 +191,19 @@ export const Header: React.FC<HeaderProps> = ({
       {/* Refined texture overlay */}
       <div className="absolute inset-0 texture-elegant pointer-events-none rounded-b-lg"></div>
       <div className="relative z-10 flex flex-wrap items-center justify-between">
-        {/* Mobile Sidebar Toggle Button - visible only on small screens */}
+        {/* Mobile/Tablet Sidebar Toggle Button - visible only on small screens */}
         {editMode && (
           <div className="lg:hidden mr-2">
-            {" "}
-            {/* Container for the button, shows on <lg screens */}
             <Button
               variant="outline"
-              size="icon"
+              size="sm"
               onClick={onToggleMobileSidebar}
-              className="border-accent/30 bg-accent/5 hover:bg-accent/15 h-10 w-10 shadow-sm"
-              aria-label="Toggle sidebar"
+              className="border-accent/30 bg-accent/5 hover:bg-accent/15 h-10 px-2.5 sm:px-3 shadow-sm flex items-center gap-1.5 text-foreground font-medium"
+              aria-label="Toggle Guest List"
+              title="Toggle Guest List"
             >
-              {isMobileSidebarOpen ? <X size={20} /> : <Menu size={20} />}
+              {isMobileSidebarOpen ? <X size={18} /> : <Menu size={18} />}
+              <span className="text-xs font-semibold">Guest List</span>
             </Button>
           </div>
         )}

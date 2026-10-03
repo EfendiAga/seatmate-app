@@ -394,8 +394,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
   }, [groupedGuests]);
 
   const sidebarRootClasses = isInSheet
-    ? "bg-sidebar flex flex-col h-full overflow-hidden"
-    : "relative bg-sidebar flex flex-col h-full border-r border-sidebar-border/70 overflow-hidden lg:w-80";
+    ? "bg-sidebar flex flex-col h-full overflow-hidden w-full"
+    : "relative bg-sidebar flex flex-col h-full border-r border-sidebar-border/70 overflow-hidden w-80";
 
   return (
     <div className={sidebarRootClasses}>
