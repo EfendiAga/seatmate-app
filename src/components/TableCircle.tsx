@@ -249,6 +249,14 @@ const TableCircleContent: React.FC<{
     }
   };
 
+  const hasHighlightedGuest = useMemo(() => {
+    if (!highlightedGuestId) return false;
+    const guest = guests.find(g => g.id === highlightedGuestId);
+    return guest?.tableId === shape.id;
+  }, [highlightedGuestId, guests, shape.id]);
+
+  const isHighlighted = shape.id === currentlyHoveredTableId || hasHighlightedGuest;
+
   const handleDragStart = (e: Konva.KonvaEventObject<DragEvent>) => {
     setIsDragging(true);
     // Prevent stage drag if Alt is pressed when starting shape drag
@@ -400,8 +408,8 @@ const TableCircleContent: React.FC<{
             <Circle
               radius={shape.radius || MIN_TABLE_RADIUS}
               fill={COLORS.tableFill}
-              stroke={shape.id === currentlyHoveredTableId ? COLORS.highlightedTableStroke : COLORS.tableStroke}
-              strokeWidth={shape.id === currentlyHoveredTableId ? COLORS.highlightedTableStrokeWidth : 2}
+              stroke={isHighlighted ? COLORS.highlightedTableStroke : COLORS.tableStroke}
+              strokeWidth={isHighlighted ? COLORS.highlightedTableStrokeWidth : 2}
               shadowBlur={isSelected ? 12 : 6}
               shadowColor={COLORS.shadowColor}
               shadowOpacity={isSelected ? 0.4 : 0.2}
@@ -418,8 +426,8 @@ const TableCircleContent: React.FC<{
               height={shape.height || 60}
               cornerRadius={8}
               fill={COLORS.tableFill}
-              stroke={shape.id === currentlyHoveredTableId ? COLORS.highlightedTableStroke : COLORS.tableStroke}
-              strokeWidth={shape.id === currentlyHoveredTableId ? COLORS.highlightedTableStrokeWidth : 2}
+              stroke={isHighlighted ? COLORS.highlightedTableStroke : COLORS.tableStroke}
+              strokeWidth={isHighlighted ? COLORS.highlightedTableStrokeWidth : 2}
               shadowBlur={isSelected ? 12 : 6}
               shadowColor={COLORS.shadowColor}
               shadowOpacity={isSelected ? 0.4 : 0.2}

@@ -114,64 +114,34 @@ export function GuestSimpleSearch() {
 
         {/* Selected Guest Details */}
         {selectedGuest && (
-          <div className="bg-card rounded-3xl shadow-2xl border border-primary/20 overflow-hidden animate-in zoom-in-95 duration-500">
-            {/* Table Number Banner */}
-            <div className="bg-primary/10 p-8 text-center border-b border-primary/10 relative overflow-hidden">
-              <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-50" />
-              <MapPin size={48} className="mx-auto text-primary mb-4 animate-bounce" />
-              <h2 className="text-2xl font-semibold text-foreground mb-1">
-                {`${selectedGuest.firstName} ${selectedGuest.lastName}`.trim() || "Unnamed Guest"}
-              </h2>
-              <div className="text-muted-foreground mb-4">You are seated at</div>
-              
-              <div className="inline-block bg-primary text-primary-foreground px-8 py-3 rounded-full text-4xl font-bold shadow-lg">
-                {assignedTable ? `Table ${assignedTable.number}` : "Unassigned"}
-              </div>
-            </div>
-
-            {/* Table Mates Section */}
-            {assignedTable && tableMates.length > 0 && (
-              <div className="p-6 md:p-8 bg-card">
-                <div className="flex items-center space-x-2 text-muted-foreground mb-6">
-                  <Users size={20} />
-                  <h3 className="font-medium text-lg">Joining you at Table {assignedTable.number}</h3>
+          <div className="bg-card rounded-2xl shadow-xl border border-primary/20 overflow-hidden animate-in zoom-in-95 duration-300">
+            <div className="bg-primary/5 p-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+              <div className="flex items-center space-x-4">
+                <div className="h-12 w-12 bg-primary/20 rounded-full flex flex-shrink-0 items-center justify-center shadow-inner">
+                  <MapPin size={24} className="text-primary animate-bounce" />
                 </div>
-                
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  {tableMates.map((mate) => (
-                    <div key={mate.id} className="flex items-center space-x-3 bg-muted/30 p-3 rounded-xl">
-                      <div className="h-8 w-8 rounded-full bg-background flex items-center justify-center text-muted-foreground">
-                        <User size={16} />
-                      </div>
-                      <span className="font-medium">{`${mate.firstName} ${mate.lastName}`.trim() || "Unnamed Guest"}</span>
-                    </div>
-                  ))}
+                <div className="text-center sm:text-left">
+                  <h2 className="text-xl font-bold text-foreground">
+                    {`${selectedGuest.firstName} ${selectedGuest.lastName}`.trim() || "Unnamed Guest"}
+                  </h2>
+                  <div className="text-sm text-muted-foreground mt-0.5">
+                    {assignedTable ? (
+                      <span>You are seated at <strong className="text-primary font-bold text-base bg-primary/10 px-2 py-0.5 rounded ml-1">Table {assignedTable.number}</strong></span>
+                    ) : (
+                      "Please see the host for your seating arrangement."
+                    )}
+                  </div>
                 </div>
               </div>
-            )}
-            
-            {assignedTable && tableMates.length === 0 && (
-              <div className="p-6 md:p-8 text-center text-muted-foreground">
-                You are currently the only one seated at this table.
-              </div>
-            )}
-
-            {!assignedTable && (
-              <div className="p-6 md:p-8 text-center text-muted-foreground">
-                Please see the host for your seating arrangement.
-              </div>
-            )}
-
-            <div className="p-4 bg-muted/20 border-t border-border/50 text-center">
               <button 
                 onClick={() => {
                   setSelectedGuestId(null);
                   setSearchedGuestId(null);
                   setSearchQuery("");
                 }}
-                className="text-primary font-medium hover:underline px-4 py-2"
+                className="text-primary text-sm font-semibold hover:bg-primary/10 px-4 py-2 bg-primary/5 rounded-lg transition-colors whitespace-nowrap border border-primary/20"
               >
-                Search for another guest
+                Clear Search
               </button>
             </div>
           </div>
